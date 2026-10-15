@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trajguard"
+version = "0.1.0"
+description = "Auditable robot trajectory quality checks with compressed-image preservation"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "h5py>=3.8"]
+
+[project.optional-dependencies]
+test = ["pytest>=7", "Pillow>=9"]
+
+[project.scripts]
+trajguard = "trajguard.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["trajguard*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

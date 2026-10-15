@@ -1,65 +1,92 @@
-# 🤖 VLA-Data-Pipeline: Embodied AI Data Auto-Cleaning & Relabeling
+# TrajGuard
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Data Format](https://img.shields.io/badge/Data-HDF5%20%7C%20Zarr-orange.svg)]()
+**可追溯的机器人轨迹数据质检与处理工具。** 面向 HDF5 演示轨迹，支持多 episode、多相机、时间重采样、规则质检、压缩帧保留和断点续跑。默认离线运行，不需要 GPU、API Key 或境外服务。
 
-> 面向具身智能与 VLA 模型的大规模多模态轨迹数据**自动化清洗、对齐与重打标**工程管线。
+基于 [Escapist-coder/VLA-Data-Pipeline](https://github.com/Escapist-coder/VLA-Data-Pipeline) 的工程改造。上游 `0707ad7` 用于基线复现；原 Python 脚本保留，新工具由 `trajguard/` 独立实现。上游原说明见 [docs/UPSTREAM_README.md](docs/UPSTREAM_README.md)。能力与实验结果以新文档和测试为准。
 
----
+## 实现范围
 
-## 🎥 效果演示 (Demo)
+| 部分 | 新工具行为 |
+|---|---|
+| 适配 | ALOHA 风格根目录及 robomimic 风格 data/demo_*；所有 episode、多相机 |
+| 语义 | 区分 joint_positions 与 eef_position；单位、检查列、离散动作列显式配置 |
+| 质检 | 空/单帧、NaN/Inf、短轨迹、累计运动量、速度阈值、重复/乱序时间戳及时间覆盖 |
+| 重采样 | 共同时间范围，不外推、不跨大缺口插值；离散动作前值保持 |
+| 图像 | 不解码 JPEG；按批复制编码字节，保留来源帧索引，避免提前展开整段视频 |
+| 批处理 | 可配进程数、最多 2×workers 个在途任务、单 episode 故障隔离 |
+| 恢复 | 输入 SHA256+版本+配置决定任务签名；校验成品哈希后才跳过；每任务保存清单 |
+| 审计 | 保留原指令、来源指纹、时间模式、插值策略、帧索引、规则和结果 |
+| 报告 | 自包含 HTML 状态筛选页、JSON 清单、人工审核队列 |
+| 标注 | 离线候选模板、来源签名及审核状态校验；不随机伪造标签，不覆盖原文 |
 
-<div align="center">
-  
+尚未实现 Zarr/RLDS、ROS、自动估计时钟偏移/漂移、四元数插值、关节周期展开、真实 VLM 推理或下游策略训练。图像编码字节保留不等于已验证可解码或视觉质量，标记为 encoded_payload_unvalidated。不能把任意姿态向量当作可直接线性插值的数据。
 
-https://github.com/user-attachments/assets/02f7dc55-9ec4-4891-a823-2db0282b5437
+## 安装与演示
 
-
-  <p><i>示意视频: 经过 Pipeline 清洗并由 VLM 自动生成高质量指令的具身操作轨迹</i></p>
-</div>
-
-本管线对原始数据的核心提升，直观体现在**多模态对齐**与**语义丰富度**上，下图为描述性的对比表格：
-
-| 📉 处理前 (Raw Dirty Data) | 📈 本管线处理后 (Cleaned & Relabeled) |
-| :--- | :--- |
-| ❌ **物理状态:** 包含未对齐的 50Hz 高频噪声 | ✅ **物理状态:** 30Hz 多模态时间戳完美对齐 |
-| ❌ **异常数据:** 夹杂短尾断裂、速度突变帧 | ✅ **异常数据:** 经 Kinematic Filter 拦截剔除 |
-| ❌ **原始标签:** `"chair truncated"` | ✅ **VLM 丰富标签:** `"The robot pushes the chair under the table to organize the spatial arrangement."` |
-
-*(注：左侧模拟原始未经清洗的粗糙状态，右侧为经过 Pipeline 标准化落盘后的高质量训练集状态。)*
-
-## 📌 项目背景 (Background)
-在人形机器人与双臂灵巧操作的 VLA 模型训练中，**“数据决定了模型的上限”**。真实遥操作采集的数据往往充满噪声。本项目致力于解决以下三大行业痛点：
-1. **异构传感器频率未对齐**（如 30Hz 视觉与 50Hz 本体状态错位）。
-2. **运动学异常与噪声**（如传感器丢包导致的末端速度突变、静止发呆轨迹）。
-3. **人类文本指令匮乏**（粗粒度标签导致模型语言泛化性极差）。
-
-## ⚙️ 系统架构 (System Architecture)
-
-本项目包含四大核心引擎，构成完整的串行数据处理 DAG（有向无环图）：
-
-1. `Parser Engine`: 智能路由 HDF5 解析器，兼容 `ALOHA` 与 `BridgeData V2` 异构树状结构。
-2. `Kinematic Filter`: 运动学质检器，基于 $L_2$ 范数与一阶差分 $\Delta q / \Delta t$ 拦截物理违规轨迹。
-3. `Sync Engine`: 多模态对齐器，采用连续变量 `Linear` + 离散动作 `Nearest-neighbor` 的混合插值策略。
-4. `VLM Relabeler`: 视觉大模型引擎，提取轨迹首尾关键帧 ($I_0, I_T$)，可调用 Gemini 1.5 Flash 接口生成细粒度空间语义标签。
-
-## 🚀 性能基准测试 (Performance Benchmark)
-
-得益于 `concurrent.futures.ProcessPoolExecutor` 引入的**多进程并发架构 (Multiprocessing)**，本管线在处理 IO+CPU 密集型任务时表现优异，并行效率达约80%：
-
-| 环境配置 | 数据规模 | 原始预计耗时 (单核) | 本管线耗时 (多进程) | 加速比 |
-| :--- | :--- | :--- | :--- | :--- |
-| 8-Core CPU, NVMe SSD | 50 GB (~500 HDF5) | ~ 65 分钟 | **~ 12 分钟** | **5.4x** |
-
-
-## 🛠️ 快速复现 (Quick Start)
-
-本项目内置了微型测试数据，您可以零成本一键跑通整个流水线，请参照[项目博客](https://blog.csdn.net/2303_77547168/article/details/158650625?sharetype=blogdetail&sharerId=158650625&sharerefer=PC&sharesource=2303_77547168&spm=1011.2480.3001.8118)进行操作后运行主干流水线 (使用 example_data 里的微型数据)
-
+Python 3.10+；本机验证使用 Python 3.12.4。
 
 ```bash
-python main_pipeline.py --input example_data --output clean_data
+python -m pip install -e ".[test]"
+python scripts/make_demo.py --output ../work/trajguard-demo
+python -m trajguard run --input ../work/trajguard-demo --output ../outputs/trajguard-demo --config configs/synthetic.json --workers 2
+python scripts/evaluate_demo.py --truth ../work/trajguard-demo/ground_truth.json --manifest ../outputs/trajguard-demo/manifest.json --output ../outputs/trajguard-demo/evaluation.json
 ```
 
-另外，在实际操作时的方法与重打标可视化等也在博客中，如有兴趣请详细阅读
+打开 `../outputs/trajguard-demo/report.html`。7 个受控样例预期：2 accepted、4 rejected、1 review。往返后回到起点的正常轨迹应通过，静止轨迹等待人工判断。这是受控回归验证，不是对真实数据的检测精确率。Windows 可使用明确的解释器，例如 `& 'D:\anaconda\python.exe' -m trajguard ...`。
+
+## 处理自己的数据
+
+```bash
+python -m trajguard run --input /data/episodes --output /data/trajguard-output --config configs/default.json --workers 2
+python -m trajguard run --input /data/episodes --output /data/trajguard-output --config configs/default.json --workers 2 --resume
+```
+
+输出目录必须在输入树之外。不默认所有相机是 30Hz，不默认末列是离散夹爪。路径、单位、时间和控制语义见 [docs/DATA_CONTRACT.md](docs/DATA_CONTRACT.md)。
+
+- recorded_timestamps：各流都有记录时间戳，并假设位于同一时钟域。
+- assumed_rate：至少一个流来自用户显式指定的采样率，保留该假设。
+- index_only：所有流无时间信息且长度一致，仅按索引配对，不称为时间对齐。
+- 部分流有时间而另一些缺失时拒绝处理，不偷偷生成时间。
+
+max_speed 使用检查列的单位/秒，必须声明 state_unit。checked_state_indices 可排除夹爪等不同量纲列，检查列应具有可比较的单位。无时间信息却配置速度阈值时拒绝处理。
+
+退出码：0=工具完成（可能含 rejected/review）；1=存在文件/工作进程处理失败；2=调用/配置错误。是否有可用数据必须读取清单。
+
+## 输出与恢复
+
+```text
+output/
+  manifest.json          # 当前数据集成员、规则、耗时、签名与成品哈希
+  review_queue.json      # review/rejected/failed 的人工检查入口
+  report.html            # 可筛选报告
+  episodes/*.hdf5        # accepted 产物，按签名命名
+```
+
+产物保留编码图像、重采样状态/动作、原始指令、目标/源时间轴和帧索引。**成员以当前 manifest 中 accepted 的 artifact 列表为准，不能直接 glob episodes。** 配置或输入变化会生成不同签名的产物，历史文件保留；重复实验需规划存储。
+
+HDF5 临时文件关闭后原子替换，每个 episode 完成即原子写 manifest。恢复会重新读取输入/成品计算哈希，失败任务会重试。输出锁 .trajguard.lock 防止并发写入；硬终止后确认无活动任务再手动移除遗留锁。输入应为稳定快照。并发最优值受存储和数据分布影响，默认 1 个进程。
+
+## 离线标注审核
+
+```bash
+python -m trajguard label-template --manifest ../outputs/trajguard-demo/manifest.json --output ../outputs/trajguard-demo/candidates.json
+# 人工或外部 VLM 填写候选后：
+python -m trajguard labels --manifest ../outputs/trajguard-demo/manifest.json --input ../outputs/trajguard-demo/candidates.json --output ../outputs/trajguard-demo/labels.json
+```
+
+状态为 candidate/reviewed/uncertain。reviewed 必须填审核人；VLM 候选必须记录模型和 prompt_version；过期/重复/非 accepted 任务引用被拒绝。校验只保证结构与来源，不判断描述正确，reviewed 是用户声明。执行后描述是否适合作为训练前指令需另行审核，候选不会覆盖原始指令。
+
+## 测试与实验
+
+```bash
+python -m pytest
+python scripts/benchmark.py --output ../outputs/trajguard-benchmark
+```
+
+覆盖时间偏移、因果保持、无交集、空/单帧、往返运动、状态列、JPEG 字节不变、变长帧、写入失败、损坏成品恢复、配置/输入变更、多 episode、多进程隔离和标签来源。
+
+benchmark 用独立子进程比较 1/2/4 个 worker，并提供单 episode 全量 JPEG 展开的内存参考。它是小型纯色 JPEG，压缩率有明显偏向；RSS 是单 worker 生命周期峰值，不是池总内存；解码参考不执行同样的完整流程，不用于端到端加速比。本次小样本中单进程更快。真实性能、真实异常精确率/召回率、VLM 质量和策略收益需要后续独立实验。
+
+## 来源与贡献
+
+新实现集中在 trajguard/、tests/、configs/、scripts/。reproduction/ 是之前的基线工具，不是新入口。建议简历表述为“基于开源 Demo 的工程改造”，见 [docs/RESUME.md](docs/RESUME.md)。不要引用上游 50GB 或 5.4× 作为自己的结果。

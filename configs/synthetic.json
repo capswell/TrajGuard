@@ -1,0 +1,10 @@
+{
+  "min_frames": 15,
+  "state_unit": "rad",
+  "max_speed": 4.0,
+  "min_path_length": 0.01,
+  "reference_camera": "cam_high",
+  "discrete_action_indices": [2],
+  "action_interpolation": "linear",
+  "decoded_color_order": "rgb"
+}
