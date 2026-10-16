@@ -1,0 +1,379 @@
+{
+  "scope": "real ALOHA episodes from the blog; stable inputs; warm filesystem cache, no cache flush",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.4 | packaged by Anaconda, Inc. | (main, Jun 18 2024, 15:03:56) [MSC v.1929 64 bit (AMD64)]",
+  "tool_commit": "cea069a4cf3ae58a588e4f1f02810f192bef99b8",
+  "config": {
+    "min_frames": 15,
+    "min_path_length": 0.01,
+    "allow_stationary": false,
+    "max_speed": null,
+    "state_unit": "unknown",
+    "reference_camera": "cam_high",
+    "action_interpolation": "previous",
+    "chunk_frames": 8,
+    "decoded_color_order": "unknown"
+  },
+  "sources": [
+    {
+      "path": "C:\\Users\\12853\\Desktop\\TrajGuard\\data\\aloha-blog\\episode_0.hdf5",
+      "bytes": 140154944,
+      "datasets": {
+        "action": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        },
+        "base_action": {
+          "shape": [
+            2000,
+            2
+          ],
+          "dtype": "float32"
+        },
+        "compress_len": {
+          "shape": [
+            3,
+            2400
+          ],
+          "dtype": "float32"
+        },
+        "observations/effort": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        },
+        "observations/images/cam_high": {
+          "shape": [
+            2000,
+            23276
+          ],
+          "dtype": "uint8"
+        },
+        "observations/images/cam_left_wrist": {
+          "shape": [
+            2000,
+            23276
+          ],
+          "dtype": "uint8"
+        },
+        "observations/images/cam_right_wrist": {
+          "shape": [
+            2000,
+            23276
+          ],
+          "dtype": "uint8"
+        },
+        "observations/qpos": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        },
+        "observations/qvel": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        }
+      },
+      "attributes": {
+        "compress": true,
+        "sim": false
+      }
+    },
+    {
+      "path": "C:\\Users\\12853\\Desktop\\TrajGuard\\data\\aloha-blog\\episode_1.hdf5",
+      "bytes": 143802944,
+      "datasets": {
+        "action": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        },
+        "base_action": {
+          "shape": [
+            2000,
+            2
+          ],
+          "dtype": "float32"
+        },
+        "compress_len": {
+          "shape": [
+            3,
+            2400
+          ],
+          "dtype": "float32"
+        },
+        "observations/effort": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        },
+        "observations/images/cam_high": {
+          "shape": [
+            2000,
+            23884
+          ],
+          "dtype": "uint8"
+        },
+        "observations/images/cam_left_wrist": {
+          "shape": [
+            2000,
+            23884
+          ],
+          "dtype": "uint8"
+        },
+        "observations/images/cam_right_wrist": {
+          "shape": [
+            2000,
+            23884
+          ],
+          "dtype": "uint8"
+        },
+        "observations/qpos": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        },
+        "observations/qvel": {
+          "shape": [
+            2000,
+            14
+          ],
+          "dtype": "float32"
+        }
+      },
+      "attributes": {
+        "compress": true,
+        "sim": false
+      }
+    }
+  ],
+  "trials": [
+    {
+      "external_wall_seconds": 2.0196997999992163,
+      "sampled_peak_tree_rss_bytes": 56119296,
+      "stdout": "{\"counts\": {\"accepted\": 2}, \"processed\": 2, \"resumed\": 0, \"wall_seconds\": 1.452421999998478}\n",
+      "stderr": "",
+      "repeat": 1,
+      "workers": 1,
+      "pipeline_wall_seconds": 1.452421999998478,
+      "accepted_frames": 4000,
+      "counts": {
+        "accepted": 2
+      },
+      "output_bytes": 189725877,
+      "max_worker_lifetime_peak_rss_bytes": 57688064
+    },
+    {
+      "external_wall_seconds": 1.9665784999997413,
+      "sampled_peak_tree_rss_bytes": 153141248,
+      "stdout": "{\"counts\": {\"accepted\": 2}, \"processed\": 2, \"resumed\": 0, \"wall_seconds\": 1.4244617000003927}\n",
+      "stderr": "",
+      "repeat": 1,
+      "workers": 2,
+      "pipeline_wall_seconds": 1.4244617000003927,
+      "accepted_frames": 4000,
+      "counts": {
+        "accepted": 2
+      },
+      "output_bytes": 189725877,
+      "max_worker_lifetime_peak_rss_bytes": 56119296
+    },
+    {
+      "external_wall_seconds": 2.0467348999991373,
+      "sampled_peak_tree_rss_bytes": 56537088,
+      "stdout": "{\"counts\": {\"accepted\": 2}, \"processed\": 2, \"resumed\": 0, \"wall_seconds\": 1.4612016999999469}\n",
+      "stderr": "",
+      "repeat": 2,
+      "workers": 1,
+      "pipeline_wall_seconds": 1.4612016999999469,
+      "accepted_frames": 4000,
+      "counts": {
+        "accepted": 2
+      },
+      "output_bytes": 189725877,
+      "max_worker_lifetime_peak_rss_bytes": 56905728
+    },
+    {
+      "external_wall_seconds": 1.9443798000029346,
+      "sampled_peak_tree_rss_bytes": 153477120,
+      "stdout": "{\"counts\": {\"accepted\": 2}, \"processed\": 2, \"resumed\": 0, \"wall_seconds\": 1.4053630999987945}\n",
+      "stderr": "",
+      "repeat": 2,
+      "workers": 2,
+      "pipeline_wall_seconds": 1.4053630999987945,
+      "accepted_frames": 4000,
+      "counts": {
+        "accepted": 2
+      },
+      "output_bytes": 189725877,
+      "max_worker_lifetime_peak_rss_bytes": 56233984
+    },
+    {
+      "external_wall_seconds": 1.946895899996889,
+      "sampled_peak_tree_rss_bytes": 52748288,
+      "stdout": "{\"counts\": {\"accepted\": 2}, \"processed\": 2, \"resumed\": 0, \"wall_seconds\": 1.4060690000005707}\n",
+      "stderr": "",
+      "repeat": 3,
+      "workers": 1,
+      "pipeline_wall_seconds": 1.4060690000005707,
+      "accepted_frames": 4000,
+      "counts": {
+        "accepted": 2
+      },
+      "output_bytes": 189725877,
+      "max_worker_lifetime_peak_rss_bytes": 56946688
+    },
+    {
+      "external_wall_seconds": 1.9322070999987773,
+      "sampled_peak_tree_rss_bytes": 149098496,
+      "stdout": "{\"counts\": {\"accepted\": 2}, \"processed\": 2, \"resumed\": 0, \"wall_seconds\": 1.3918687000004866}\n",
+      "stderr": "",
+      "repeat": 3,
+      "workers": 2,
+      "pipeline_wall_seconds": 1.3918687000004866,
+      "accepted_frames": 4000,
+      "counts": {
+        "accepted": 2
+      },
+      "output_bytes": 189725877,
+      "max_worker_lifetime_peak_rss_bytes": 56311808
+    }
+  ],
+  "summary": [
+    {
+      "workers": 1,
+      "median_pipeline_seconds": 1.452421999998478,
+      "median_external_seconds": 2.0196997999992163,
+      "max_worker_peak_rss_bytes": 57688064,
+      "max_sampled_tree_rss_bytes": 56537088
+    },
+    {
+      "workers": 2,
+      "median_pipeline_seconds": 1.4053630999987945,
+      "median_external_seconds": 1.9443798000029346,
+      "max_worker_peak_rss_bytes": 56311808,
+      "max_sampled_tree_rss_bytes": 153477120
+    }
+  ],
+  "audit": [
+    {
+      "source": "C:\\Users\\12853\\Desktop\\TrajGuard\\data\\aloha-blog\\episode_0.hdf5",
+      "artifact": "C:\\Users\\12853\\Desktop\\TrajGuard\\outputs\\aloha-real\\processed\\episodes\\442f2e08fbd3447f3573-fc97368e5db801dc.hdf5",
+      "source_sha256": "15551ae5d56de56400eb0600fa3b853c3b665702617f87e28e38b1217ad21406",
+      "state_frames": 2000,
+      "state_dimensions": 14,
+      "action_dimensions": 14,
+      "state_and_action_values_equal": true,
+      "cameras": [
+        {
+          "name": "cam_high",
+          "frames": 2000,
+          "shape": [
+            2000,
+            23276
+          ],
+          "payload_sha256": "72bb5d4e27b8668d0d814d5605e5a1eebc0ce300ae898e786443ac54351dcc82",
+          "all_payload_bytes_equal": true
+        },
+        {
+          "name": "cam_left_wrist",
+          "frames": 2000,
+          "shape": [
+            2000,
+            23276
+          ],
+          "payload_sha256": "086a560a6e8c6b52ddd9f4430be109875df47e063de7f8d81c902f59aa221bfc",
+          "all_payload_bytes_equal": true
+        },
+        {
+          "name": "cam_right_wrist",
+          "frames": 2000,
+          "shape": [
+            2000,
+            23276
+          ],
+          "payload_sha256": "623fae89f2efc34d8bcef7b69e836213e02cc1dc622967bf883a5072a9b38a1f",
+          "all_payload_bytes_equal": true
+        }
+      ],
+      "output_bytes": 93871126,
+      "alignment_mode": "index_only"
+    },
+    {
+      "source": "C:\\Users\\12853\\Desktop\\TrajGuard\\data\\aloha-blog\\episode_1.hdf5",
+      "artifact": "C:\\Users\\12853\\Desktop\\TrajGuard\\outputs\\aloha-real\\processed\\episodes\\c4a965dc7430ed5ddc46-5840364162123982.hdf5",
+      "source_sha256": "980d199afab651b7291073c17d23d64488274f87ebaf23997403b2bb5e599598",
+      "state_frames": 2000,
+      "state_dimensions": 14,
+      "action_dimensions": 14,
+      "state_and_action_values_equal": true,
+      "cameras": [
+        {
+          "name": "cam_high",
+          "frames": 2000,
+          "shape": [
+            2000,
+            23884
+          ],
+          "payload_sha256": "94a069e682eac9aaf810092d623aa1069999e7ad80d938ed9d3a6c96e46541ad",
+          "all_payload_bytes_equal": true
+        },
+        {
+          "name": "cam_left_wrist",
+          "frames": 2000,
+          "shape": [
+            2000,
+            23884
+          ],
+          "payload_sha256": "7b66ced4fbc25943aec4be6540f47763f51d5b2633eeec304786950411a06c3d",
+          "all_payload_bytes_equal": true
+        },
+        {
+          "name": "cam_right_wrist",
+          "frames": 2000,
+          "shape": [
+            2000,
+            23884
+          ],
+          "payload_sha256": "c54f74dfe9ddd4a606990bb6931793e09a238ec13d8385b2edad85edcdef361f",
+          "all_payload_bytes_equal": true
+        }
+      ],
+      "output_bytes": 95854751,
+      "alignment_mode": "index_only"
+    }
+  ],
+  "resume": {
+    "external_wall_seconds": 0.9800452000017685,
+    "sampled_peak_tree_rss_bytes": 53248000,
+    "stdout": "{\"counts\": {\"accepted\": 2}, \"processed\": 0, \"resumed\": 2, \"wall_seconds\": 0.36065400000006775}\n",
+    "stderr": "",
+    "pipeline_wall_seconds": 0.36065400000006775,
+    "processed": 0,
+    "resumed": 2
+  },
+  "notes": [
+    "Pipeline timing includes source hashing, checks, export and output hashing; excludes final report rendering and independent byte audit.",
+    "External timing includes Python/process startup and report writing; downloads excluded.",
+    "Tree RSS sampled every 20ms sums RSS including shared pages and may miss short peaks; worker lifetime peak is a different metric.",
+    "No timestamps in these samples: index_only is not evidence for physical time alignment accuracy or velocity thresholds.",
+    "Acceptance on two demonstration files is not an anomaly-detection precision/recall estimate.",
+    "Only supported state/actions/cameras are exported; base_action/effort/qvel and other unsupported source fields remain in original files.",
+    "Repeated runs replace the same signed artifact paths, keeping only one bulk processed copy."
+  ]
+}

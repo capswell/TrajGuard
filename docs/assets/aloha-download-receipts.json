@@ -1,0 +1,16 @@
+[
+  {
+    "file": "episode_0.hdf5",
+    "file_id": "11M3Ye0r5agMaaicPbVGD0q2Hb3rGklbb",
+    "bytes": 140154944,
+    "sha256": "15551ae5d56de56400eb0600fa3b853c3b665702617f87e28e38b1217ad21406",
+    "source_folder": "https://drive.google.com/drive/folders/1vhKa4tNPfMkeK7SW86vKorb39epTYW39"
+  },
+  {
+    "file": "episode_1.hdf5",
+    "file_id": "1-tx7SvYYgSvXCvnf_EI2OVdwK-CkFY6S",
+    "bytes": 143802944,
+    "sha256": "980d199afab651b7291073c17d23d64488274f87ebaf23997403b2bb5e599598",
+    "source_folder": "https://drive.google.com/drive/folders/1vhKa4tNPfMkeK7SW86vKorb39epTYW39"
+  }
+]
