@@ -1,0 +1,11 @@
+{
+  "min_frames": 15,
+  "min_path_length": 0.01,
+  "allow_stationary": false,
+  "max_speed": null,
+  "state_unit": "unknown",
+  "reference_camera": "cam_high",
+  "action_interpolation": "previous",
+  "chunk_frames": 8,
+  "decoded_color_order": "unknown"
+}
