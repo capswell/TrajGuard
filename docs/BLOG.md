@@ -1,8 +1,69 @@
-# 从真实 ALOHA 数据出发：搭建机器人多模态轨迹处理管线 TrajGuard
+# 机器人多模态数据工程实战：从解析、清洗、对齐到重标注与真实 ALOHA 验证
 
 一条机器人示范轨迹，除了相机画面，还包含关节状态、动作及其他采集字段。把 HDF5 读出来只是第一步：哪些轨迹可以保留、图像是否被改变、处理用了什么规则、中断后能不能继续，都需要在数据准备阶段解决。
 
 本文以真实 ALOHA 的 episode_0 和 episode_1 为例，介绍 TrajGuard 的实现和成果。两条轨迹合计约 284 MB，包含 4000 个时间步与三路相机共 12000 帧图像，最终得到标准化 HDF5 成品和可追溯的处理清单。
+
+## 工程总览：从原始轨迹到可检查的成品
+
+整个工程围绕视觉、机器人状态、动作和语言指令四类数据组织，既有用于理解完整链路的模块化演示，也有用于真实样本处理的 TrajGuard 命令行入口。
+
+```text
+HDF5 轨迹
+   ↓
+解析图像、状态、动作和指令
+   ↓
+运动规则过滤 → 不通过的样例与原因
+   ↓
+连续状态 / 离散动作重采样
+   ├── 演示：首尾关键帧 → 模拟语义重标注 → clean_data
+   └── 真实处理：压缩帧保留 → 标准化导出 → 来源清单与审核队列
+   ↓
+成品检查 / 视频预览 / HTML 质量页
+```
+
+### 数据解析与视频预览
+
+`bridge_parser.py` 根据 HDF5 字段选择图像、状态和动作，识别 agentview_image、images0、images/top 等约定路径；data 组下取第一条 demo。其 export_to_mp4 接口接受已解码 RGB 像素序列，转为 OpenCV 使用的 BGR 后写入视频。
+
+真实样本使用 cam_high、腕部相机和 JPEG 编码数组，需要由适配层识别。TrajGuard 的 adapters 模块支持多 episode、多相机；历史复现脚本 reproduction/adapt_real.py 展示了单路 JPEG 解码适配。本文实际处理采用保留编码的路径，避免整段提前展开。视频播放帧率与采集时间戳分别处理。
+
+### 运动规则过滤
+
+`kinematic_filter.py` 演示三个检查：最短轨迹长度、首尾状态的 L2 距离、相邻帧变化的最大值。最后一项计算的是帧间差，并未除以时间，不能直接解释为物理速度。首尾距离也可能将正常往返轨迹判成静止。
+
+真实处理入口采用累计运动量和数值有效性检查，并在时间、单位明确时支持速度阈值。这样可以保留运动过滤这一环节，同时让每个检查对应可解释的条件。
+
+### 多模态对齐与插值
+
+`time_sync.py` 演示状态和连续动作的线性插值，以及末列夹爪动作的最近邻插值。其时间轴由帧数和目标帧率构造，等帧数时直接返回；original_robot_hz 参数未参与计算。`time_sync_show.py` 用 50 个机器人采样点和 30 个相机采样点展示该过程。
+
+TrajGuard 的 alignment 模块进一步区分记录时间戳、用户假定频率和仅索引配对，在共同时间覆盖范围内重采样，并支持离散动作前值保持。本文真实样本使用的是索引配对，不能用它来证明 50 Hz 到 30 Hz 的实测同步效果。
+
+### 语义重标注与审核
+
+`vlm_relabel.py` 包含首尾关键帧提取、PIL 图像转换和任务描述 prompt，要求描述对象、颜色及空间关系变化。当前离线分支随机返回预设句子，真实 API 分支的客户端与推理调用仍是注释占位，填写 API Key 不能直接完成推理。
+
+因此，这部分展示了重标注接口和数据流。TrajGuard 的 labels 模块提供另一项实际能力：生成候选模板，检查标签引用的轨迹、来源签名和审核状态，保留原始指令。接入外部模型后可以把输出交给审核流程，但当前实验没有评价真实 VLM 的描述质量。
+
+### 多进程调度与成品检查
+
+`main_pipeline.py` 以文件为单位创建进程池，在每个任务中执行解析、质检、重采样、模拟重标注和 HDF5 落盘。`inspect_clean_data.py` 检查其 images、qpos、actions、instruction 字段。
+
+TrajGuard 的 pipeline 与 storage 模块支持配置并发数、单轨迹故障隔离、原子写入，以及通过输入和成品哈希验证断点恢复。其输出格式与演示入口不同，使用质量页和清单管理结果。
+
+完整演示可在项目根目录运行：
+
+```bash
+python -m pip install -e ".[test,benchmark]"
+python -m pip install scipy opencv-python Pillow tqdm
+python generate_test_cases.py
+python time_sync_show.py
+python main_pipeline.py
+python inspect_clean_data.py
+```
+
+生成器会写入 test_data 下的样例；主入口固定读取 test_data，输出到 clean_data，标签属于模拟输出。需要预览时，调用 VLADatasetParser.export_to_mp4；具体命令见 [README](../README.md)。下面使用真实数据处理入口展示整个工程目前可验证的成果。
 
 ## 一、先看原始数据里有什么
 
