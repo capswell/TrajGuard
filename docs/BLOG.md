@@ -8,10 +8,20 @@
 
 ## 视频效果演示
 
-[观看机器人轨迹演示视频](https://github.com/user-attachments/assets/02f7dc55-9ec4-4891-a823-2db0282b5437)
+[![TrajGuard 三路相机演示](../assets/trajguard-demo.jpg)](../assets/trajguard-demo.mp4)
 
-视频来源为原项目 VLA-Data-Pipeline，仓库中的对应文件为 `assets/demo.mp4`。它展示机器人轨迹与视频呈现形式；视频中的标签不作为本文工程的真实 VLM 推理结果。下文介绍数据处理、标注接口及结果验证的具体实现。
+[观看本项目生成的演示视频](../assets/trajguard-demo.mp4)
 
+视频直接读取 TrajGuard 导出的 HDF5 成品，展示主视角、左右腕部相机、轨迹帧索引和质量状态。源数据为公开 ALOHA 示范，数据处理与视频制作由本项目完成。视频使用间隔取帧、25 fps 预览播放，不表示采集时间，也未加入模拟语言标签。
+
+复现视频：
+
+```bash
+python -m pip install Pillow imageio-ffmpeg
+python scripts/render_demo.py --manifest ../outputs/aloha-real/processed/manifest.json --output assets/trajguard-demo.mp4 --swap-rb
+```
+
+`--swap-rb` 是这批数据核对后的颜色设置。发布到 CSDN 时，将生成的 assets/trajguard-demo.mp4 上传为视频，并以 assets/trajguard-demo.jpg 作为封面。
 ## 1. 为什么要做机器人数据处理管线
 
 机器人示范数据往往由相机图像、关节或末端状态、动作指令以及任务描述共同组成。文件能够读取，并不意味着它已经适合后续训练：短轨迹可能来自误触录制，无效数值可能导致训练异常，缺少时间信息的状态与图像也需要明确配对规则。

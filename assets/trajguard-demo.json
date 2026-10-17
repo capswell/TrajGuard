@@ -1,0 +1,29 @@
+{
+  "video": "trajguard-demo.mp4",
+  "frames": 1000,
+  "fps": 25,
+  "duration_seconds": 40.0,
+  "stride": 4,
+  "swap_rb": true,
+  "resolution": [
+    1280,
+    800
+  ],
+  "episodes": [
+    {
+      "source": "episode_0.hdf5",
+      "signature": "fc97368e5db801dc1485e323861fa1fd766c6ce9e27891ec1b090ae535e51b41",
+      "source_frames": 2000,
+      "preview_frames": 500,
+      "alignment": "index_only"
+    },
+    {
+      "source": "episode_1.hdf5",
+      "signature": "58403641621239828ab1898f1003e05fc3f9f1bac43678b6e99c656521c2653b",
+      "source_frames": 2000,
+      "preview_frames": 500,
+      "alignment": "index_only"
+    }
+  ],
+  "note": "Preview sampled from processed artifacts; playback is not physical timing. No VLM labels."
+}

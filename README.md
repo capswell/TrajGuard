@@ -8,13 +8,22 @@
 
 ## 🎥 效果演示（Demo）
 
-https://github.com/user-attachments/assets/02f7dc55-9ec4-4891-a823-2db0282b5437
+[![TrajGuard 三路相机轨迹演示](assets/trajguard-demo.jpg)](assets/trajguard-demo.mp4)
 
-[查看仓库中的 MP4 视频](assets/demo.mp4)
+**[▶ 播放 / 下载演示视频](assets/trajguard-demo.mp4)**
 
-*视频来源：原项目 VLA-Data-Pipeline，用于展示机器人轨迹与视频呈现形式。视频中的标签不作为当前 TrajGuard 真实 VLM 推理结果；当前处理能力与成果见下文。*
+*从 TrajGuard 导出的 HDF5 成品生成：主视角 + 左右腕部相机，展示轨迹帧索引与质检状态。源数据为公开 ALOHA 示范，处理及视频制作由本项目完成。*
 
-## 项目简介
+视频长 40 秒，采用间隔取帧和 25 fps 预览播放；画面中的 index_only 表示索引配对。播放速度不代表采集时间，视频未叠加模拟语言标签。
+
+| 原始数据 | 管线输出 |
+|---|---|
+| 状态、动作和多路相机分散存储 | 标准化 HDF5，保留相机与来源索引 |
+| 质量信息需要逐条检查 | 规则判定、HTML 质量页与人工审核队列 |
+| 处理来源难以复查 | 输入/配置签名、来源和成品哈希 |
+| 重复运行整批任务 | 校验后复用已完成结果 |
+
+## 📌 项目背景（Background）
 
 机器人示范数据包含视觉、状态、动作和语言指令。TrajGuard 将数据接入、质量检查、时间处理、标准化导出与结果审核组织为完整工作流，使每条输出轨迹都能追溯到来源文件、处理配置和源帧索引。
 
@@ -22,23 +31,7 @@ https://github.com/user-attachments/assets/02f7dc55-9ec4-4891-a823-2db0282b5437
 
 **阅读入口：** [实现详解](docs/BLOG.md) · [数据约定](docs/DATA_CONTRACT.md)
 
-## 功能概览
-
-| 功能 | 实现 |
-|---|---|
-| 多模态解析 | 接入 ALOHA、robomimic 风格 HDF5，读取状态、动作、指令和多路相机 |
-| 轨迹质量检查 | 长度、NaN/Inf、累计运动量、时间有效性，以及时间和单位明确时的速度检查 |
-| 多模态重采样 | 共同时间范围内处理连续量与离散动作，记录时间来源和插值策略 |
-| 图像存储 | JPEG 编码帧分块复制，支持原始像素及变长编码帧，保留相机来源索引 |
-| 语义标注 | 首尾关键帧与 prompt 示例、候选标签生成接口、标签来源和审核状态校验 |
-| 视频可视化 | RGB 像素序列导出 MP4，检查成品字段、形状和指令 |
-| 并行处理 | 文件/轨迹级任务调度，可配置工作进程数，单轨迹失败隔离 |
-| 断点恢复 | 输入与配置签名、成品 SHA256 校验、原子写入和任务清单 |
-| 质量管理 | accepted/review/rejected/failed 状态、HTML 质量页和人工审核队列 |
-
-语义重标注模块提供首尾帧与模拟输出演示；真实 VLM 客户端是待接入扩展点。离线标签审核可直接使用，原始指令独立保留。
-
-## 系统架构
+## ⚙️ 系统架构（System Architecture）
 
 ```mermaid
 flowchart TD
@@ -56,7 +49,21 @@ flowchart TD
 
 推荐使用 `python -m trajguard` 进行批处理。根目录的 `main_pipeline.py` 串联解析、过滤、重采样、模拟重标注和落盘，适合演示完整模块协作。两种入口的输出 schema 不同。
 
-## 处理成果
+| 功能 | 实现 |
+|---|---|
+| 多模态解析 | 接入 ALOHA、robomimic 风格 HDF5，读取状态、动作、指令和多路相机 |
+| 轨迹质量检查 | 长度、NaN/Inf、累计运动量、时间有效性，以及时间和单位明确时的速度检查 |
+| 多模态重采样 | 共同时间范围内处理连续量与离散动作，记录时间来源和插值策略 |
+| 图像存储 | JPEG 编码帧分块复制，支持原始像素及变长编码帧，保留相机来源索引 |
+| 语义标注 | 首尾关键帧与 prompt 示例、候选标签生成接口、标签来源和审核状态校验 |
+| 视频可视化 | RGB 像素序列导出 MP4，检查成品字段、形状和指令 |
+| 并行处理 | 文件/轨迹级任务调度，可配置工作进程数，单轨迹失败隔离 |
+| 断点恢复 | 输入与配置签名、成品 SHA256 校验、原子写入和任务清单 |
+| 质量管理 | accepted/review/rejected/failed 状态、HTML 质量页和人工审核队列 |
+
+语义重标注模块提供首尾帧与模拟输出演示；真实 VLM 客户端是待接入扩展点。离线标签审核可直接使用，原始指令独立保留。
+
+## 📊 处理成果（Results）
 
 | 原始数据 | 处理结果 |
 |---|---|
@@ -79,7 +86,7 @@ output/
 
 成品导出支持的状态、动作和相机字段；其他源字段继续保留在原文件。下游从当前 manifest 的 accepted 列表读取成品。
 
-## 快速开始
+## 🚀 快速复现（Quick Start）
 
 ### 1. 安装
 
@@ -119,7 +126,16 @@ python -m trajguard labels --manifest ../outputs/processed/manifest.json --input
 
 标签状态包括 candidate、reviewed、uncertain。reviewed 需要审核人，VLM 来源需要 model 和 prompt_version；校验来源及结构，语义正确性由审核环节判断。
 
-## 模块演示与视频预览
+## 🎬 生成自己的演示视频
+
+```bash
+python -m pip install Pillow imageio-ffmpeg
+python scripts/render_demo.py --manifest ../outputs/aloha-real/processed/manifest.json --output assets/trajguard-demo.mp4 --swap-rb
+```
+
+脚本从 accepted 成品逐帧读取三路相机编码数据，生成 H.264 MP4、封面和预览元数据。`--swap-rb` 是当前 ALOHA 样本经参考画面核对后的颜色设置；其他数据需根据颜色语义选择。默认字体为 Windows Segoe UI，Linux 使用 `--font` 指定可用的 TrueType 字体路径。
+
+## 🧩 模块演示（Modules）
 
 ```bash
 python -m pip install scipy opencv-python Pillow tqdm
@@ -137,7 +153,7 @@ python -c "from bridge_parser import VLADatasetParser; p=VLADatasetParser('test_
 
 视频接口接受 RGB 像素，默认以 30 fps 播放；播放速率与采集时间语义分开管理。
 
-## 工程目录
+## 📂 项目结构（Structure）
 
 ```text
 .
@@ -157,7 +173,7 @@ python -c "from bridge_parser import VLADatasetParser; p=VLADatasetParser('test_
 └── reproduction/          # 基线复现辅助工具
 ```
 
-## 验证与性能设计
+## 🧪 测试与性能（Validation）
 
 ```bash
 python -m pytest
