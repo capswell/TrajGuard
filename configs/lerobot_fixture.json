@@ -1,0 +1,46 @@
+{
+  "repo_id": "local/trajguard-fixture",
+  "robot_type": "synthetic",
+  "fps": 30,
+  "cameras": {
+    "cam_high": "high"
+  },
+  "colors": {
+    "cam_high": "rgb"
+  },
+  "state_dimensions": [
+    {
+      "name": "s0",
+      "unit": "fixture_unit"
+    },
+    {
+      "name": "s1",
+      "unit": "fixture_unit"
+    }
+  ],
+  "action_dimensions": [
+    {
+      "name": "a0",
+      "unit": "fixture_unit"
+    },
+    {
+      "name": "a1",
+      "unit": "fixture_unit"
+    },
+    {
+      "name": "gripper",
+      "unit": "fixture_unit"
+    }
+  ],
+  "action_semantics": {
+    "representation": "synthetic_test_values",
+    "coordinate_frame": "fixture",
+    "rotation": "none",
+    "gripper": "binary synthetic command",
+    "time_interval": "command held on [t,t+1/fps)",
+    "control_frequency": 30
+  },
+  "seed": 42,
+  "validation_fraction": 0.2,
+  "use_videos": false
+}

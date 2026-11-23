@@ -190,3 +190,7 @@ python scripts/benchmark_real.py --input ../data/aloha-blog --output ../outputs/
 ## 致谢
 
 项目参考 [Escapist-coder/VLA-Data-Pipeline](https://github.com/Escapist-coder/VLA-Data-Pipeline)，原始脚本及 [上游说明](docs/UPSTREAM_README.md) 保留在仓库中。ALOHA 数据入口见 [公开数据目录](https://drive.google.com/drive/folders/1vhKa4tNPfMkeK7SW86vKorb39epTYW39)。
+
+## LeRobot 训练数据接入（开发中）
+
+新增 export-lerobot 和 import-droid 入口，配置、验证范围及 Franka 采集约定见 [LeRobot 接入说明](docs/LEROBOT.md)。使用可选的独立 LeRobot 0.6.1 环境；核心管线依赖保持不变。
