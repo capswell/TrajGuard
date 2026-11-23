@@ -86,6 +86,17 @@ output/
 
 成品导出支持的状态、动作和相机字段；其他源字段继续保留在原文件。下游从当前 manifest 的 accepted 列表读取成品。
 
+## ✅ 真实公开数据验证
+
+| 数据 | 规模 | 实际验证 |
+|---|---|---|
+| ALOHA episode_0 / episode_1 | 4000 个时间步、14 维状态/动作、三路相机共 12000 帧 | TrajGuard → LeRobot H.264 → 实际读取，视频全帧解码通过 |
+| DROID 官方 RLDS（Franka） | 404 个时间步、8 维状态/动作、三路相机共 1212 帧 | TFDS → TrajGuard → LeRobot 图像模式，原始与转换数据逐步核对通过 |
+
+两组均通过数值、任务关联、图像对应、50 步未来动作及末尾 padding 检查，完整成品恢复验证通过。独立集成环境 **70 项测试通过**。频率采用显式假设；ALOHA 缺失指令使用标记为人工粗描述的文本，不作为原始精细标注。模型训练和真机评测仍待验证。
+
+[完整验证结果与复现命令](docs/REAL_PUBLIC_VALIDATION.md) · [兼容性表](docs/COMPATIBILITY.md) · [扩展指南](docs/EXTENDING.md) · [贡献方式](CONTRIBUTING.md)
+
 ## 🚀 快速复现（Quick Start）
 
 ### 1. 安装
@@ -125,6 +136,25 @@ python -m trajguard labels --manifest ../outputs/processed/manifest.json --input
 ```
 
 标签状态包括 candidate、reviewed、uncertain。reviewed 需要审核人，VLM 来源需要 model 和 prompt_version；校验来源及结构，语义正确性由审核环节判断。
+
+## 🔌 LeRobot 与 DROID 扩展
+
+核心数据处理保持与模型和机器人控制软件解耦；LeRobot 是可选导出集成，π₀.₅ 和 Franka 是下游应用案例。
+
+- **LeRobot 0.6.1 导出：** 将当前 accepted 成品映射为状态、动作、多相机和任务，支持图像与 H.264 视频存储，保留源轨迹和帧映射。
+- **DROID RLDS 接入：** 读取官方 TFDS 发行数据中的关节位置、夹爪、三路相机及语言指令；原始 H5 + 外部 MP4 形式尚未支持。
+- **训练数据管理：** 固定间隔校验与连续片段切分，按源轨迹身份划分训练/验证集，单独计算训练帧统计量，检查未来动作块与边界 padding。
+- **语义与诊断：** 配置状态/动作定义、单位、坐标系、旋转表示及逐相机颜色；未知信息保留诊断，需要相关语义的步骤会检查必要条件。
+
+Python 3.12+ 独立环境可运行最小格式转换：
+
+```bash
+python -m pip install -e ".[test,lerobot]"
+python -m trajguard export-lerobot --manifest ../outputs/trajguard-demo/manifest.json --config configs/lerobot_fixture.json --output ../outputs/trajguard-demo-lerobot
+python scripts/check_lerobot.py --root ../outputs/trajguard-demo-lerobot --horizon 50
+```
+
+先运行上文“运行示例”生成输入；该导出配置仅用于合成样例。基础质检流程不需要 LeRobot。DROID 的 TFDS 可选依赖及真实数据命令见 [集成说明](docs/LEROBOT.md)。
 
 ## 🎬 生成自己的演示视频
 
@@ -187,40 +217,11 @@ python scripts/benchmark_real.py --input ../data/aloha-blog --output ../outputs/
 
 该脚本针对 ALOHA 索引配对导出进行测量与核验。分块读写控制图像缓冲量；有界任务提交控制并发积压；断点恢复避免重复导出。并发配置应根据磁盘带宽、轨迹长度和内存预算选择。
 
+## 许可与数据说明
+
+保留已有上游来源说明。当前完整项目许可证和部分样例再分发条件仍待确认，具体文件归属及发布待办见 [许可与数据状态](docs/RELEASE_STATUS.md)。
+
 ## 致谢
 
 项目参考 [Escapist-coder/VLA-Data-Pipeline](https://github.com/Escapist-coder/VLA-Data-Pipeline)，原始脚本及 [上游说明](docs/UPSTREAM_README.md) 保留在仓库中。ALOHA 数据入口见 [公开数据目录](https://drive.google.com/drive/folders/1vhKa4tNPfMkeK7SW86vKorb39epTYW39)。
 
-## 🔌 LeRobot 与 DROID 扩展
-
-核心数据处理保持与模型和机器人控制软件解耦；LeRobot 是可选导出集成，π₀.₅ 和 Franka 是下游应用案例。
-
-- **LeRobot 0.6.1 导出：** 将当前 accepted 成品映射为状态、动作、多相机和任务，支持图像与 H.264 视频存储，保留源轨迹和帧映射。
-- **DROID RLDS 接入：** 读取官方 TFDS 发行数据中的关节位置、夹爪、三路相机及语言指令；原始 H5 + 外部 MP4 形式尚未支持。
-- **训练数据管理：** 固定间隔校验与连续片段切分，按源轨迹身份划分训练/验证集，单独计算训练帧统计量，检查未来动作块与边界 padding。
-- **语义与诊断：** 配置状态/动作定义、单位、坐标系、旋转表示及逐相机颜色；未知信息保留诊断，需要相关语义的步骤会检查必要条件。
-
-Python 3.12+ 独立环境可运行最小格式转换：
-
-```bash
-python -m pip install -e ".[test,lerobot]"
-python -m trajguard export-lerobot --manifest ../outputs/trajguard-demo/manifest.json --config configs/lerobot_fixture.json --output ../outputs/trajguard-demo-lerobot
-python scripts/check_lerobot.py --root ../outputs/trajguard-demo-lerobot --horizon 50
-```
-
-先运行上文“运行示例”生成输入；该导出配置仅用于合成样例。基础质检流程不需要 LeRobot。DROID 的 TFDS 可选依赖及真实数据命令见 [集成说明](docs/LEROBOT.md)。
-
-## ✅ 真实公开数据验证
-
-| 数据 | 规模 | 实际验证 |
-|---|---|---|
-| ALOHA episode_0 / episode_1 | 4000 个时间步、14 维状态/动作、三路相机共 12000 帧 | TrajGuard → LeRobot H.264 → 实际读取，视频全帧解码通过 |
-| DROID 官方 RLDS（Franka） | 404 个时间步、8 维状态/动作、三路相机共 1212 帧 | TFDS → TrajGuard → LeRobot 图像模式，原始与转换数据逐步核对通过 |
-
-两组均通过数值、任务关联、图像对应、50 步未来动作及末尾 padding 检查，完整成品恢复验证通过。独立集成环境 **70 项测试通过**。频率采用显式假设；ALOHA 缺失指令使用标记为人工粗描述的文本，不作为原始精细标注。模型训练和真机评测仍待验证。
-
-[完整验证结果与复现命令](docs/REAL_PUBLIC_VALIDATION.md) · [兼容性表](docs/COMPATIBILITY.md) · [扩展指南](docs/EXTENDING.md) · [贡献方式](CONTRIBUTING.md)
-
-## 许可与数据说明
-
-保留已有上游来源说明。当前完整项目许可证和部分样例再分发条件仍待确认，具体文件归属及发布待办见 [许可与数据状态](docs/RELEASE_STATUS.md)。
