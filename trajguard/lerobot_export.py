@@ -108,6 +108,7 @@ def export(manifest_path, output, config_path, resume=False):
     if installed != '0.6.1':
         raise ValueError('This exporter requires lerobot==0.6.1')
     from lerobot.datasets.lerobot_dataset import LeRobotDataset
+    from lerobot.configs.video import RGBEncoderConfig
     features = {key: {'dtype': 'float32', 'shape': (len(c[dim]),), 'names': [d['name'] for d in c[dim]]}
                 for key, dim in [('observation.state', 'state_dimensions'), ('action', 'action_dimensions')]}
     writer = None
@@ -158,7 +159,8 @@ def export(manifest_path, output, config_path, resume=False):
                     features[key] = feature
                 if writer is None:
                     writer = LeRobotDataset.create(repo_id=c['repo_id'], root=stage, fps=c['fps'], features=features,
-                        robot_type=c['robot_type'], use_videos=c.get('use_videos', True))
+                        robot_type=c['robot_type'], use_videos=c.get('use_videos', True),
+                        rgb_encoder=RGBEncoderConfig(vcodec=c.get('video_codec', 'h264'), crf=c.get('video_crf', 18)), encoder_threads=1)
                 for indices in islands:
                     if split == 'train':
                         training['state'].append(state[indices])

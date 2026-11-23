@@ -1,0 +1,146 @@
+{
+  "repo_id": "local/aloha-public-validation",
+  "robot_type": "mobile_aloha",
+  "fps": 50,
+  "cameras": {
+    "cam_high": "cam_high",
+    "cam_left_wrist": "cam_left_wrist",
+    "cam_right_wrist": "cam_right_wrist"
+  },
+  "colors": {
+    "cam_high": "bgr",
+    "cam_left_wrist": "bgr",
+    "cam_right_wrist": "bgr"
+  },
+  "state_dimensions": [
+    {
+      "name": "joint_0",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_1",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_2",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_3",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_4",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_5",
+      "unit": "rad"
+    },
+    {
+      "name": "gripper_6",
+      "unit": "dimensionless_native_normalized"
+    },
+    {
+      "name": "joint_7",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_8",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_9",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_10",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_11",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_12",
+      "unit": "rad"
+    },
+    {
+      "name": "gripper_13",
+      "unit": "dimensionless_native_normalized"
+    }
+  ],
+  "action_dimensions": [
+    {
+      "name": "joint_0",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_1",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_2",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_3",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_4",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_5",
+      "unit": "rad"
+    },
+    {
+      "name": "gripper_6",
+      "unit": "dimensionless_native_normalized"
+    },
+    {
+      "name": "joint_7",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_8",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_9",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_10",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_11",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_12",
+      "unit": "rad"
+    },
+    {
+      "name": "gripper_13",
+      "unit": "dimensionless_native_normalized"
+    }
+  ],
+  "action_semantics": {
+    "representation": "absolute_joint_position_and_native_gripper",
+    "coordinate_frame": "robot_joint_coordinates",
+    "rotation": "none",
+    "gripper": "native normalized scalar, preserved without clipping or calibration",
+    "time_interval": "source row command paired with same observation index; physical execution delay unverified",
+    "control_frequency": 50
+  },
+  "seed": 42,
+  "validation_fraction": 0.5,
+  "use_videos": true,
+  "index_fps_basis": "50 Hz explicitly assumed from Mobile ALOHA reference recorder; no recorded clock in supplied samples",
+  "fallback_instruction": "Manipulate the chairs. [manual coarse description for format validation; not an original annotation]",
+  "video_codec": "h264",
+  "video_crf": 18
+}

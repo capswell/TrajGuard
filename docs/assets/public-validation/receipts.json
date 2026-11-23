@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://drive.google.com/uc?export=download&id=11M3Ye0r5agMaaicPbVGD0q2Hb3rGklbb",
+    "file": "..\\data\\public-validation\\aloha\\episode_0.hdf5",
+    "bytes": 140154944,
+    "sha256": "15551ae5d56de56400eb0600fa3b853c3b665702617f87e28e38b1217ad21406"
+  },
+  {
+    "url": "https://drive.google.com/uc?export=download&id=1-tx7SvYYgSvXCvnf_EI2OVdwK-CkFY6S",
+    "file": "..\\data\\public-validation\\aloha\\episode_1.hdf5",
+    "bytes": 143802944,
+    "sha256": "980d199afab651b7291073c17d23d64488274f87ebaf23997403b2bb5e599598"
+  },
+  {
+    "url": "https://storage.googleapis.com/gresearch/robotics/droid_100/1.0.0/dataset_info.json",
+    "file": "..\\data\\public-validation\\droid\\1.0.0\\dataset_info.json",
+    "bytes": 760,
+    "sha256": "58646aa75fd054a0d8670edd676620267adb32550dc228545d70a3418abb1834"
+  },
+  {
+    "url": "https://storage.googleapis.com/gresearch/robotics/droid_100/1.0.0/features.json",
+    "file": "..\\data\\public-validation\\droid\\1.0.0\\features.json",
+    "bytes": 18665,
+    "sha256": "4c556e2e38e179e41089e07cf54273b1540d67d3c78a420898370329813c9a25"
+  },
+  {
+    "url": "https://storage.googleapis.com/gresearch/robotics/droid_100/1.0.0/r2d2_faceblur-train.tfrecord-00000-of-00031",
+    "file": "..\\data\\public-validation\\droid\\1.0.0\\r2d2_faceblur-train.tfrecord-00000-of-00031",
+    "bytes": 27488816,
+    "sha256": "37d04d3586fbde386d14122320d8f7d866b37007ff7a8d96625e72a3994dda70"
+  }
+]

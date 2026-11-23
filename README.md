@@ -63,7 +63,7 @@ python -m trajguard export-lerobot --manifest ../outputs/demo/manifest.json --co
 python scripts/check_lerobot.py --root ../outputs/demo-lerobot --horizon 50
 ```
 
-示例配置仅适用于上述合成样例。导出保留维度、任务关联和来源清单，固定间隔片段分开写入，训练统计仅根据 train 划分另存。训练时需显式选择 train episodes 并连接对应归一化 processor。已在真实 LeRobot 0.6.1 writer/reader 上验证图像模式、双相机、动作块与边界 padding；视频模式与其他版本待验证。
+示例配置仅适用于上述合成样例。导出保留维度、任务关联和来源清单，固定间隔片段分开写入，训练统计仅根据 train 划分另存。训练时需显式选择 train episodes 并连接对应归一化 processor。已在真实 LeRobot 0.6.1 writer/reader 上验证图像模式、双相机、动作块与边界 padding；真实 ALOHA H.264 与官方 DROID RLDS 图像模式已验证；其他版本待验证。
 
 [完整集成说明](docs/LEROBOT.md) 包含 DROID 范围、Franka 最小采集约定和未执行的 π₀.₅ 短训模板。它们不是运行核心工具的前提。
 
@@ -92,3 +92,6 @@ python -m pytest
 ## 来源与发布状态
 
 保留 [Escapist-coder/VLA-Data-Pipeline](https://github.com/Escapist-coder/VLA-Data-Pipeline) 原模块和 [原介绍](docs/UPSTREAM_README.md)。本仓库当前缺少完整项目许可证；第三方代码与样例授权范围尚待确认，不能把整仓库视为已获 MIT 授权。自有代码许可选择、样例再分发条件及发布待办见 [发布状态](docs/RELEASE_STATUS.md)。
+## 真实公开数据验证
+
+已完成 ALOHA 4000 帧和官方 DROID（Franka）404 帧到 LeRobot 0.6.1 的实际导出、读取及 50 步未来动作检查。数据来源、命令、频率假设和验证边界见 [真实验证记录](docs/REAL_PUBLIC_VALIDATION.md)。

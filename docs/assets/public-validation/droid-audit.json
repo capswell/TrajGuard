@@ -1,0 +1,121 @@
+{
+  "dataset": "local/droid-public-validation",
+  "frames": 404,
+  "episodes": [
+    {
+      "job": "ca3a2491c66765bbc925",
+      "frames": 166,
+      "task": "Put the marker in the pot",
+      "checks": [
+        0,
+        83,
+        165
+      ],
+      "images": [
+        {
+          "frame": 0,
+          "camera": "exterior_image_1_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 0,
+          "camera": "exterior_image_2_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 0,
+          "camera": "wrist_image_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 83,
+          "camera": "exterior_image_1_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 83,
+          "camera": "exterior_image_2_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 83,
+          "camera": "wrist_image_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 165,
+          "camera": "exterior_image_1_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 165,
+          "camera": "exterior_image_2_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 165,
+          "camera": "wrist_image_left",
+          "mae_rgb_255": 0.0
+        }
+      ]
+    },
+    {
+      "job": "d50cfaf9794022c47b1d",
+      "frames": 238,
+      "task": "Put the candy bar on the left side of the first shelf",
+      "checks": [
+        0,
+        119,
+        237
+      ],
+      "images": [
+        {
+          "frame": 0,
+          "camera": "exterior_image_1_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 0,
+          "camera": "exterior_image_2_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 0,
+          "camera": "wrist_image_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 119,
+          "camera": "exterior_image_1_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 119,
+          "camera": "exterior_image_2_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 119,
+          "camera": "wrist_image_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 237,
+          "camera": "exterior_image_1_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 237,
+          "camera": "exterior_image_2_left",
+          "mae_rgb_255": 0.0
+        },
+        {
+          "frame": 237,
+          "camera": "wrist_image_left",
+          "mae_rgb_255": 0.0
+        }
+      ]
+    }
+  ],
+  "scope": "All source/artifact vector values; sampled LeRobot states, 50-step actions, masks, tasks and images. Video RGB comparison allows lossy encoding."
+}

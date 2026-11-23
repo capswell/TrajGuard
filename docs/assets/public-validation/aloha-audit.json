@@ -1,0 +1,126 @@
+{
+  "dataset": "local/aloha-public-validation",
+  "frames": 4000,
+  "episodes": [
+    {
+      "job": "437825b6978f185c560e",
+      "frames": 2000,
+      "task": "Manipulate the chairs. [manual coarse description for format validation; not an original annotation]",
+      "checks": [
+        0,
+        1000,
+        1999
+      ],
+      "images": [
+        {
+          "frame": 0,
+          "camera": "cam_high",
+          "mae_rgb_255": 1.3657020399305555
+        },
+        {
+          "frame": 0,
+          "camera": "cam_left_wrist",
+          "mae_rgb_255": 1.5430523003472223
+        },
+        {
+          "frame": 0,
+          "camera": "cam_right_wrist",
+          "mae_rgb_255": 1.4251226128472223
+        },
+        {
+          "frame": 1000,
+          "camera": "cam_high",
+          "mae_rgb_255": 1.6271755642361112
+        },
+        {
+          "frame": 1000,
+          "camera": "cam_left_wrist",
+          "mae_rgb_255": 0.8967936197916667
+        },
+        {
+          "frame": 1000,
+          "camera": "cam_right_wrist",
+          "mae_rgb_255": 1.0733040364583333
+        },
+        {
+          "frame": 1999,
+          "camera": "cam_high",
+          "mae_rgb_255": 2.1932421875
+        },
+        {
+          "frame": 1999,
+          "camera": "cam_left_wrist",
+          "mae_rgb_255": 1.0285210503472222
+        },
+        {
+          "frame": 1999,
+          "camera": "cam_right_wrist",
+          "mae_rgb_255": 1.1887749565972223
+        }
+      ]
+    },
+    {
+      "job": "94a891e6fcbb7e43e527",
+      "frames": 2000,
+      "task": "Manipulate the chairs. [manual coarse description for format validation; not an original annotation]",
+      "checks": [
+        0,
+        1000,
+        1999
+      ],
+      "images": [
+        {
+          "frame": 0,
+          "camera": "cam_high",
+          "mae_rgb_255": 1.458595920138889
+        },
+        {
+          "frame": 0,
+          "camera": "cam_left_wrist",
+          "mae_rgb_255": 1.618703342013889
+        },
+        {
+          "frame": 0,
+          "camera": "cam_right_wrist",
+          "mae_rgb_255": 1.5324262152777777
+        },
+        {
+          "frame": 1000,
+          "camera": "cam_high",
+          "mae_rgb_255": 1.5028678385416667
+        },
+        {
+          "frame": 1000,
+          "camera": "cam_left_wrist",
+          "mae_rgb_255": 1.395810546875
+        },
+        {
+          "frame": 1000,
+          "camera": "cam_right_wrist",
+          "mae_rgb_255": 0.8752072482638888
+        },
+        {
+          "frame": 1999,
+          "camera": "cam_high",
+          "mae_rgb_255": 1.6949598524305556
+        },
+        {
+          "frame": 1999,
+          "camera": "cam_left_wrist",
+          "mae_rgb_255": 1.7127387152777778
+        },
+        {
+          "frame": 1999,
+          "camera": "cam_right_wrist",
+          "mae_rgb_255": 1.9068229166666666
+        }
+      ]
+    }
+  ],
+  "decoded_video_frames_by_camera": {
+    "cam_high": 4000,
+    "cam_left_wrist": 4000,
+    "cam_right_wrist": 4000
+  },
+  "scope": "All source/artifact vector values; sampled LeRobot states, 50-step actions, masks, tasks and images. Video RGB comparison allows lossy encoding."
+}

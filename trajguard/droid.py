@@ -59,7 +59,7 @@ def convert_episode(steps, metadata, output):
 def import_tfds(builder_dir, output, limit=2):
     import tensorflow_datasets as tfds
     builder = tfds.builder_from_directory(builder_dir)
-    for i, episode in enumerate(builder.as_dataset(split='train', shuffle_files=False)):
+    for i, episode in enumerate(builder.as_dataset(split=f'train[:{limit}]', shuffle_files=False)):
         if i >= limit:
             break
         metadata = tfds.as_numpy(episode['episode_metadata'])

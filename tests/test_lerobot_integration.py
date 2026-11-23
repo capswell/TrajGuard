@@ -14,7 +14,8 @@ from trajguard.lerobot_export import export
 
 
 @pytest.mark.skipif(importlib.util.find_spec('lerobot') is None, reason='requires lerobot==0.6.1')
-def test_real_writer_reader_and_integrity(tmp_path):
+@pytest.mark.parametrize('use_videos', [False, True])
+def test_real_writer_reader_and_integrity(tmp_path, use_videos):
     raw = tmp_path / 'raw'
     raw.mkdir()
     for i in range(2):
@@ -26,6 +27,8 @@ def test_real_writer_reader_and_integrity(tmp_path):
     c = json.loads((Path(__file__).parents[1]/'configs/lerobot_fixture.json').read_text())
     c['cameras']['wrist'] = 'wrist'
     c['colors']['wrist'] = 'rgb'
+    c['use_videos'] = use_videos
+    c['video_codec'] = 'h264'
     cfg = tmp_path/'export.json'
     cfg.write_text(json.dumps(c))
     manifest = tmp_path/'qc/manifest.json'

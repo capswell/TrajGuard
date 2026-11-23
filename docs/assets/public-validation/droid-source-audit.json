@@ -1,0 +1,21 @@
+{
+  "builder": "r2d2_faceblur/1.0.0",
+  "episodes": [
+    {
+      "source_identity": {
+        "file_path": "/nfs/kun2/datasets/r2d2/r2d2-data-full/RAIL/success/2023-04-17/Mon_Apr_17_14:48:05_2023/trajectory.h5",
+        "recording_folderpath": "/nfs/kun2/datasets/r2d2/r2d2-data-full/RAIL/success/2023-04-17/Mon_Apr_17_14:48:05_2023/recordings/MP4"
+      },
+      "frames": 166,
+      "all_vectors_images_instructions_equal": true
+    },
+    {
+      "source_identity": {
+        "file_path": "/nfs/kun2/datasets/r2d2/r2d2-data-full/RPL/success/2023-06-05/Mon_Jun__5_20:15:38_2023/trajectory.h5",
+        "recording_folderpath": "/nfs/kun2/datasets/r2d2/r2d2-data-full/RPL/success/2023-06-05/Mon_Jun__5_20:15:38_2023/recordings/MP4"
+      },
+      "frames": 238,
+      "all_vectors_images_instructions_equal": true
+    }
+  ]
+}

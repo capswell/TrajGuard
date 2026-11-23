@@ -1,4 +1,6 @@
-# LeRobot 0.6.1 接入（开发中）
+# LeRobot 0.6.1 接入
+
+最新真实样本验证：ALOHA 4000 帧 H.264、官方 DROID 404 帧图像模式均已通过实际读取及未来动作检查。参见 [真实验证记录](REAL_PUBLIC_VALIDATION.md)，下方日期记录保留历史阶段的验证情况。
 
 ## 当前范围
 
@@ -55,7 +57,7 @@ python -m trajguard run --input ../data/droid-hdf5 --output ../outputs/droid-qc 
 
 字段：observation/joint_position[7]+gripper_position[1]；action_dict/joint_position[7]+gripper_position[1]。保留绝对关节位置命令，不使用通用 action 向量，不自动转换 delta。相机为 exterior_image_1_left、exterior_image_2_left、wrist_image_left，RGB。语言取 language_instruction，要求非空且整条一致。release schema 没有时间戳，保留 index_only；频率、夹爪量纲和命令时序需根据所用发行版确认后配置导出。
 
-当前 DROID 测试仅使用按官方 schema 构造的 fixture，不是真实数据兼容性证明。真实验证需下载官方 droid_100 调试包、指定包含 dataset_info.json 的 TFDS 版本目录，然后完成 import、质检、导出、check_lerobot 四步。缺失字段、变更指令、非完整 episode 会报错。转换一次载入一条 episode 图像，不适合超长轨迹；外部源身份等属性还需进一步贯穿到核心 provenance。
+DROID 适配器已通过官方 r2d2_faceblur/1.0.0 首分片的两条真实轨迹验证；fixture 另用于回归测试。真实验证需下载官方 droid_100 调试包、指定包含 dataset_info.json 的 TFDS 版本目录，然后完成 import、质检、导出、check_lerobot 四步。缺失字段、变更指令、非完整 episode 会报错。转换一次载入一条 episode 图像，不适合超长轨迹；外部源身份属性已通过 source_metadata 贯穿到核心 provenance。
 
 ## Franka 最小采集约定
 

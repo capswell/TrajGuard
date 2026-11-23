@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-23",
+  "versions": {
+    "lerobot": "0.6.1",
+    "torch": "2.11.0",
+    "numpy": "2.2.6",
+    "h5py": "3.16.0",
+    "av": "15.1.0",
+    "tensorflow": "2.20.0",
+    "tensorflow-datasets": "4.9.10"
+  },
+  "tests": {
+    "exit_code": 0,
+    "passed": 70
+  },
+  "datasets": {
+    "aloha": {
+      "input_episodes": 2,
+      "output_episodes": 2,
+      "input_frames": 4000,
+      "output_frames": 4000,
+      "dropped_frames": 0,
+      "use_videos": true,
+      "elapsed_seconds": 530.1526921999175,
+      "fps_assumption": "50 Hz explicitly assumed from Mobile ALOHA reference recorder; no recorded clock in supplied samples",
+      "max_sampled_rgb_mae": 2.1932421875,
+      "reader_and_resume_exit": 0,
+      "splits": [
+        "train",
+        "train"
+      ]
+    },
+    "droid": {
+      "input_episodes": 2,
+      "output_episodes": 2,
+      "input_frames": 404,
+      "output_frames": 404,
+      "dropped_frames": 0,
+      "use_videos": false,
+      "elapsed_seconds": 38.33517460001167,
+      "fps_assumption": "15 Hz DROID control-rate convention, no recorded clock in RLDS steps",
+      "max_sampled_rgb_mae": 0.0,
+      "reader_and_resume_exit": 0,
+      "splits": [
+        "train",
+        "train"
+      ]
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "repo_id": "local/droid-public-validation",
+  "robot_type": "franka_droid",
+  "fps": 15,
+  "cameras": {
+    "exterior_image_1_left": "exterior_image_1_left",
+    "exterior_image_2_left": "exterior_image_2_left",
+    "wrist_image_left": "wrist_image_left"
+  },
+  "colors": {
+    "exterior_image_1_left": "rgb",
+    "exterior_image_2_left": "rgb",
+    "wrist_image_left": "rgb"
+  },
+  "state_dimensions": [
+    {
+      "name": "joint_0",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_1",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_2",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_3",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_4",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_5",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_6",
+      "unit": "rad"
+    },
+    {
+      "name": "gripper_7",
+      "unit": "dimensionless_native_normalized"
+    }
+  ],
+  "action_dimensions": [
+    {
+      "name": "joint_0",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_1",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_2",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_3",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_4",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_5",
+      "unit": "rad"
+    },
+    {
+      "name": "joint_6",
+      "unit": "rad"
+    },
+    {
+      "name": "gripper_7",
+      "unit": "dimensionless_native_normalized"
+    }
+  ],
+  "action_semantics": {
+    "representation": "absolute_joint_position_and_native_gripper",
+    "coordinate_frame": "robot_joint_coordinates",
+    "rotation": "none",
+    "gripper": "native normalized scalar, preserved without clipping or calibration",
+    "time_interval": "source row command paired with same observation index; physical execution delay unverified",
+    "control_frequency": 15
+  },
+  "seed": 42,
+  "validation_fraction": 0.5,
+  "use_videos": false,
+  "index_fps_basis": "15 Hz DROID control-rate convention, no recorded clock in RLDS steps"
+}

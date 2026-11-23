@@ -1,0 +1,17 @@
+[
+  {
+    "frame": 0,
+    "uncorrected_mae": 5.61912865990991,
+    "swapped_mae": 3.0323212274774773
+  },
+  {
+    "frame": 1000,
+    "uncorrected_mae": 18.325354729729728,
+    "swapped_mae": 2.5414583333333334
+  },
+  {
+    "frame": 1999,
+    "uncorrected_mae": 18.184527027027027,
+    "swapped_mae": 2.683001126126126
+  }
+]

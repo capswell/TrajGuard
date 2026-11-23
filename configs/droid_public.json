@@ -1,0 +1,14 @@
+{
+  "min_frames": 15,
+  "allow_stationary": false,
+  "min_path_length": 0.01,
+  "max_speed": null,
+  "chunk_frames": 8,
+  "reference_camera": "exterior_image_1_left",
+  "decoded_color_order": "unknown",
+  "camera_color_orders": {
+    "exterior_image_1_left": "rgb",
+    "exterior_image_2_left": "rgb",
+    "wrist_image_left": "rgb"
+  }
+}
