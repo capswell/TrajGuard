@@ -10,6 +10,11 @@ def test_gaps_split_future_action_boundaries():
     assert [g.tolist() for g in groups] == [[0, 1, 2], [3, 4]]
 
 
+def test_accumulated_clock_drift_rejected():
+    with pytest.raises(ValueError, match='clock drift'):
+        segments(np.arange(20) * .10005, 20, 10, 1e-4)
+
+
 @pytest.mark.parametrize('times', [[0, .1, .15], [0, 0, .1], [0, float('nan'), .2]])
 def test_invalid_timing(times):
     with pytest.raises(ValueError):

@@ -28,6 +28,10 @@ def process_job(job):
             status, findings, metrics = quality(episode.state, episode.actions, episode.state_time, config)
             result.update(status=status, findings=findings, metrics=metrics,
                           state_kind=episode.state_kind, time_sources=episode.time_sources)
+            result['semantics'] = {'state': config.state_semantics or {'representation': 'unknown'},
+                                   'action': config.action_semantics or {'representation': 'unknown'}}
+            result['diagnostics'] = [f'{name} semantics unspecified; acceptance only describes configured rules'
+                                     for name in ('state', 'action') if not getattr(config, f'{name}_semantics')]
             if status == "accepted":
                 aligned = align(episode, config)
                 result["alignment"] = aligned["metadata"]
@@ -38,6 +42,7 @@ def process_job(job):
                     artifact = Path(job["output"]) / "episodes" / f"{job['id']}-{job['signature'][:16]}.hdf5"
                     artifact.parent.mkdir(exist_ok=True)
                     provenance = {"source": job["source"], "source_sha256": job["source_sha256"], "episode": job["episode"], "signature": job["signature"], "version": __version__, "config": job["config"], "time_sources": episode.time_sources}
+                    provenance['source_metadata'] = {k: str(v) for k, v in handle[job['episode']].attrs.items()}
                     write_episode(artifact, episode, aligned, config, provenance)
                     result.update(artifact=str(artifact), artifact_sha256=fingerprint(artifact), output_bytes=artifact.stat().st_size,
                                   exported_frames=len(aligned["state"]))

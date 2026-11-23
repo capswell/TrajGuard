@@ -5,7 +5,7 @@ import json
 import os
 import time
 from pathlib import Path
-from importlib.metadata import version
+from importlib.metadata import version, PackageNotFoundError
 
 import h5py
 import numpy as np
@@ -24,7 +24,11 @@ def segments(times, count, fps, tolerance):
     gap = delta > 1 / fps + tolerance
     if np.any((~gap) & (np.abs(delta - 1 / fps) > tolerance)):
         raise ValueError('Nonuniform or faster sampling: resample upstream with verified semantics')
-    return [x for x in np.split(np.arange(count), np.flatnonzero(gap) + 1) if len(x) >= 2]
+    islands = [x for x in np.split(np.arange(count), np.flatnonzero(gap) + 1) if len(x) >= 2]
+    for indices in islands:
+        if np.any(np.abs((t[indices] - t[indices[0]]) - np.arange(len(indices))/fps) > tolerance):
+            raise ValueError('Accumulated clock drift exceeds fixed-rate tolerance')
+    return islands
 
 
 def split_for(identity, seed, validation_fraction):
@@ -50,20 +54,29 @@ def decode(row, color):
 
 
 def validate_config(c):
+    required = {'fps', 'cameras', 'colors', 'state_dimensions', 'action_dimensions', 'action_semantics', 'repo_id', 'robot_type'}
+    if not isinstance(c, dict) or required - c.keys():
+        raise ValueError(f'Export configuration requires {sorted(required)}')
     if type(c['fps']) is not int or c['fps'] <= 0:
         raise ValueError('fps must be a positive integer')
     if not 0 <= c.get('validation_fraction', .2) < 1:
         raise ValueError('validation_fraction must be in [0,1)')
-    if c.get('time_tolerance', 1e-4) <= 0:
+    if not np.isfinite(c.get('time_tolerance', 1e-4)) or not 0 < c.get('time_tolerance', 1e-4) < .5/c['fps']:
         raise ValueError('time_tolerance must be positive')
     if not c['cameras'] or len(set(c['cameras'].values())) != len(c['cameras']):
         raise ValueError('Camera mapping must be nonempty and one-to-one')
+    if any(not isinstance(name, str) or not name.isidentifier() for name in c['cameras'].values()):
+        raise ValueError('Target camera names must be identifiers')
+    if any(c['colors'].get(camera) not in ('rgb', 'bgr') for camera in c['cameras']):
+        raise ValueError('Every camera needs confirmed rgb/bgr colors')
     for k in ('state_dimensions', 'action_dimensions'):
         rows = c[k]
         if not rows or any(not all(isinstance(r.get(f), str) and r[f].strip() for f in ('name', 'unit')) for r in rows):
             raise ValueError(f'{k}: each dimension needs name and unit')
+        if any(r['unit'] == 'unknown' for r in rows) or len({r['name'] for r in rows}) != len(rows):
+            raise ValueError(f'{k}: confirmed units and unique dimension names required')
     for key in ('representation', 'coordinate_frame', 'rotation', 'gripper', 'time_interval', 'control_frequency'):
-        if not c['action_semantics'].get(key):
+        if not c['action_semantics'].get(key) or c['action_semantics'][key] == 'unknown':
             raise ValueError(f'action_semantics.{key} required')
 
 
@@ -88,7 +101,11 @@ def export(manifest_path, output, config_path, resume=False):
     stage.parent.mkdir(parents=True, exist_ok=True)
     if stage.exists():
         raise ValueError(f'Incomplete export at {stage}; inspect it, then use a new target')
-    if version('lerobot') != '0.6.1':
+    try:
+        installed = version('lerobot')
+    except PackageNotFoundError:
+        raise ValueError('Optional integration absent: use Python >=3.12 and pip install -e ".[lerobot]"') from None
+    if installed != '0.6.1':
         raise ValueError('This exporter requires lerobot==0.6.1')
     from lerobot.datasets.lerobot_dataset import LeRobotDataset
     features = {key: {'dtype': 'float32', 'shape': (len(c[dim]),), 'names': [d['name'] for d in c[dim]]}
@@ -104,6 +121,9 @@ def export(manifest_path, output, config_path, resume=False):
             with h5py.File(job['artifact']) as h:
                 provenance = json.loads(h.attrs['provenance'])
                 identity = f"{provenance['source_sha256']}:{provenance['episode']}"
+                metadata = provenance.get('source_metadata', {})
+                if metadata.get('source_identity'):
+                    identity = metadata['source_identity']
                 split = split_for(identity, c.get('seed', 0), c.get('validation_fraction', .2))
                 raw = h['instruction'][()]
                 task = raw.decode() if isinstance(raw, bytes) else str(raw)
@@ -121,11 +141,16 @@ def export(manifest_path, output, config_path, resume=False):
                 if mode == 'index_only' and not c.get('index_fps_basis'):
                     raise ValueError('index_only requires explicit index_fps_basis; FPS is an assumption')
                 times = h['timestamps'][:] if 'timestamps' in h else None
+                if mode not in ('index_only', 'recorded_timestamps', 'assumed_rate') or (mode == 'index_only') != (times is None):
+                    raise ValueError('Time mode and timestamp presence disagree')
                 islands = segments(times, len(state), c['fps'], c.get('time_tolerance', 1e-4))
                 for camera, name in c['cameras'].items():
                     if f'images/{camera}' not in h or len(h[f'images/{camera}']) != len(state):
                         raise ValueError(f'{job_id}: camera missing or length mismatch: {camera}')
                     image = decode(h[f'images/{camera}'][0], c['colors'][camera])
+                    declared = h[f'images/{camera}'].attrs.get('decoded_color_order', 'unknown')
+                    if declared != 'unknown' and declared != c['colors'][camera]:
+                        raise ValueError(f'{camera}: export color contradicts artifact declaration')
                     feature = {'dtype': 'video' if c.get('use_videos', True) else 'image', 'shape': image.shape, 'names': ['height', 'width', 'channels']}
                     key = f'observation.images.{name}'
                     if key in features and features[key] != feature:
@@ -182,5 +207,8 @@ def export(manifest_path, output, config_path, resume=False):
         return result
     except BaseException:
         if writer is not None:
-            writer.finalize()
+            try:
+                writer.finalize()
+            except Exception:
+                pass  # Preserve the original failure; incomplete directory is never published.
         raise

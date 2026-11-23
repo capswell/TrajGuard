@@ -12,6 +12,8 @@ def render_report(manifest, path):
     for item in manifest["jobs"].values():
         status = item["status"]
         findings = "; ".join(f"{f['rule']}: {f['message']}" for f in item.get("findings", []))
+        diagnostics = '; '.join(item.get('diagnostics', []))
+        findings = '; '.join(part for part in (findings, diagnostics) if part)
         artifact = item.get("artifact")
         link = ""
         if artifact:

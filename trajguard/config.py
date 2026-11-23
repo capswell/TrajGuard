@@ -27,8 +27,29 @@ class Config:
     max_camera_delta_seconds: float = 0.05
     chunk_frames: int = 8
     decoded_color_order: str = "unknown"
+    state_semantics: dict = field(default_factory=dict)
+    action_semantics: dict = field(default_factory=dict)
+    camera_color_orders: dict[str, str] = field(default_factory=dict)
 
     def validate(self):
+        for name in ('state_semantics', 'action_semantics'):
+            values = getattr(self, name)
+            if not isinstance(values, dict):
+                raise ValueError(f'{name} must be an object; omitted fields mean unknown')
+            allowed = {'representation', 'unit', 'coordinate_frame', 'rotation', 'gripper', 'time_interval', 'frequency', 'dimensions'}
+            if set(values) - allowed:
+                raise ValueError(f'{name}: unsupported semantic fields {set(values) - allowed}')
+            for key, value in values.items():
+                if key == 'frequency':
+                    if value != 'unknown' and (isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0):
+                        raise ValueError(f'{name}.frequency must be positive or unknown')
+                elif key == 'dimensions':
+                    if not isinstance(value, list) or any(not isinstance(d, dict) or not all(isinstance(d.get(k), str) and d[k].strip() for k in ('name', 'unit')) for d in value):
+                        raise ValueError(f'{name}.dimensions requires name/unit objects')
+                elif not isinstance(value, str) or not value.strip():
+                    raise ValueError(f'{name}.{key} must be a nonempty string')
+        if not isinstance(self.camera_color_orders, dict) or any(not isinstance(k, str) or v not in ('rgb', 'bgr', 'unknown') for k, v in self.camera_color_orders.items()):
+            raise ValueError('camera_color_orders maps camera names to rgb/bgr/unknown')
         if type(self.allow_stationary) is not bool:
             raise ValueError("allow_stationary must be a JSON boolean")
         if not isinstance(self.state_unit, str) or not self.state_unit.strip():

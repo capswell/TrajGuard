@@ -44,6 +44,10 @@ def align(episode, config):
                 "metadata": {"mode": "index_only", "reference_camera": reference, "dropped_reference_frames": 0}}
     if present != len(timelines):
         raise InvalidEpisode("Partial timing information; supply missing timestamps or explicit sampling rates")
+    # Generic vector interpolation must never silently interpolate a declared pose.
+    for name, semantics, linear in [('state', config.state_semantics, True), ('action', config.action_semantics, config.action_interpolation == 'linear')]:
+        if linear and (semantics.get('rotation', 'none') not in ('none', 'unknown') or semantics.get('representation') in ('eef_pose', 'eef_delta', 'quaternion', 'se3')):
+            raise InvalidEpisode(f'{name}: pose-aware interpolation not implemented; use a dedicated adapter')
     timeline = episode.camera_times[reference]
     start, end = max(t[0] for t in timelines), min(t[-1] for t in timelines)
     keep = (timeline >= start) & (timeline <= end)

@@ -1,196 +1,94 @@
-# TrajGuard · 机器人多模态轨迹数据处理与质量管理
+# TrajGuard · 机器人多模态轨迹处理工具
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![HDF5](https://img.shields.io/badge/Data-HDF5-orange)
-![CPU](https://img.shields.io/badge/Runtime-CPU-green)
+面向社区的离线数据工具：读取机器人示范轨迹，执行规则质检与时间处理，导出带来源信息的成品，支持人工审核和可选训练格式转换。核心处理与具体机器人、控制软件及模型解耦。
 
-> 面向具身智能与 VLA 数据准备，覆盖轨迹解析、运动规则过滤、多模态重采样、语义标注审核、视频可视化和可追溯批处理。
+[兼容性表](docs/COMPATIBILITY.md) · [数据约定](docs/DATA_CONTRACT.md) · [扩展指南](docs/EXTENDING.md) · [贡献方式](CONTRIBUTING.md) · [许可与数据状态](docs/RELEASE_STATUS.md)
 
-## 🎥 效果演示（Demo）
-
-[![TrajGuard 三路相机轨迹演示](assets/trajguard-demo.jpg)](assets/trajguard-demo.mp4)
-
-**[▶ 播放 / 下载演示视频](assets/trajguard-demo.mp4)**
-
-*从 TrajGuard 导出的 HDF5 成品生成：主视角 + 左右腕部相机，展示轨迹帧索引与质检状态。源数据为公开 ALOHA 示范，处理及视频制作由本项目完成。*
-
-视频长 40 秒，采用间隔取帧和 25 fps 预览播放；画面中的 index_only 表示索引配对。播放速度不代表采集时间，视频未叠加模拟语言标签。
-
-| 原始数据 | 管线输出 |
-|---|---|
-| 状态、动作和多路相机分散存储 | 标准化 HDF5，保留相机与来源索引 |
-| 质量信息需要逐条检查 | 规则判定、HTML 质量页与人工审核队列 |
-| 处理来源难以复查 | 输入/配置签名、来源和成品哈希 |
-| 重复运行整批任务 | 校验后复用已完成结果 |
-
-## 📌 项目背景（Background）
-
-机器人示范数据包含视觉、状态、动作和语言指令。TrajGuard 将数据接入、质量检查、时间处理、标准化导出与结果审核组织为完整工作流，使每条输出轨迹都能追溯到来源文件、处理配置和源帧索引。
-
-核心管线离线运行，无需 GPU 或 API Key。工程同时提供模块化流程演示、命令行批处理工具、数据生成与验证脚本。
-
-**阅读入口：** [实现详解](docs/BLOG.md) · [数据约定](docs/DATA_CONTRACT.md)
-
-## ⚙️ 系统架构（System Architecture）
-
-```mermaid
-flowchart TD
-    A[HDF5 轨迹数据] --> B[解析状态 / 动作 / 多相机 / 指令]
-    B --> C[结构与数值质检]
-    C --> D[时间重采样或索引配对]
-    D --> E[分块导出与来源记录]
-    E --> F[标准化 HDF5 与 manifest]
-    C --> G[审核队列与 HTML 质量页]
-    F --> H[离线候选标签与审核]
-    B --> I[像素序列视频预览]
-    I --> J[首尾关键帧与重标注接口]
-    J -. 外部模型接入 .-> H
-```
-
-推荐使用 `python -m trajguard` 进行批处理。根目录的 `main_pipeline.py` 串联解析、过滤、重采样、模拟重标注和落盘，适合演示完整模块协作。两种入口的输出 schema 不同。
-
-| 功能 | 实现 |
-|---|---|
-| 多模态解析 | 接入 ALOHA、robomimic 风格 HDF5，读取状态、动作、指令和多路相机 |
-| 轨迹质量检查 | 长度、NaN/Inf、累计运动量、时间有效性，以及时间和单位明确时的速度检查 |
-| 多模态重采样 | 共同时间范围内处理连续量与离散动作，记录时间来源和插值策略 |
-| 图像存储 | JPEG 编码帧分块复制，支持原始像素及变长编码帧，保留相机来源索引 |
-| 语义标注 | 首尾关键帧与 prompt 示例、候选标签生成接口、标签来源和审核状态校验 |
-| 视频可视化 | RGB 像素序列导出 MP4，检查成品字段、形状和指令 |
-| 并行处理 | 文件/轨迹级任务调度，可配置工作进程数，单轨迹失败隔离 |
-| 断点恢复 | 输入与配置签名、成品 SHA256 校验、原子写入和任务清单 |
-| 质量管理 | accepted/review/rejected/failed 状态、HTML 质量页和人工审核队列 |
-
-语义重标注模块提供首尾帧与模拟输出演示；真实 VLM 客户端是待接入扩展点。离线标签审核可直接使用，原始指令独立保留。
-
-## 📊 处理成果（Results）
-
-| 原始数据 | 处理结果 |
-|---|---|
-| 不同 HDF5 字段布局 | 统一的 state、actions、images 与 instruction |
-| 多相机编码图像 | 按相机保留编码字节及来源索引 |
-| 时间信息可能缺失 | 显式区分记录时间、假定频率和索引配对 |
-| 轨迹质量需要逐条检查 | 规则结果、状态分类和可筛选质量页 |
-| 处理过程难以复查 | 来源哈希、配置、版本、签名和成品哈希 |
-| 重复执行整批任务 | 校验已有成品后复用有效结果 |
-
-已生成的 ALOHA 成品保留 cam_high、cam_left_wrist、cam_right_wrist 三路相机及 14 维状态/动作；导出图像编码字节、状态和动作数值通过一致性核验，恢复运行能够复用已完成任务。原始测量记录保存在 [实验记录](docs/assets/aloha-benchmark.json)。
-
-```text
-output/
-├── episodes/<任务签名>.hdf5
-├── manifest.json          # 当前成员、规则结果、签名与成品路径
-├── review_queue.json      # 待人工检查的任务
-└── report.html            # 可筛选质量页
-```
-
-成品导出支持的状态、动作和相机字段；其他源字段继续保留在原文件。下游从当前 manifest 的 accepted 列表读取成品。
-
-## 🚀 快速复现（Quick Start）
-
-### 1. 安装
+## 快速开始：CPU 最小样例
 
 Python 3.10+，在仓库根目录执行：
 
 ```bash
-python -m pip install -e ".[test,benchmark]"
+python -m pip install -e ".[test]"
+python scripts/make_demo.py --output ../work/demo
+python -m trajguard run --input ../work/demo --output ../outputs/demo --config configs/synthetic.json --workers 1
+python -m trajguard run --input ../work/demo --output ../outputs/demo --config configs/synthetic.json --workers 1 --resume
 ```
 
-### 2. 运行示例
+打开 ../outputs/demo/report.html。7 个程序生成样例预期为 2 accepted、4 rejected、1 review；这些是逻辑测试样例。基础运行依赖 NumPy/h5py，生成 JPEG 演示额外使用 test 安装项中的 Pillow，无需模型、GPU 或真实采集设备。
 
-```bash
-python scripts/make_demo.py --output ../work/trajguard-demo
-python -m trajguard run --input ../work/trajguard-demo --output ../outputs/trajguard-demo --config configs/synthetic.json --workers 1
-```
-
-打开 `../outputs/trajguard-demo/report.html` 查看结果。
-
-### 3. 处理自己的数据
-
-将 HDF5 文件放入仓库同级 `data/episodes/`，按数据语义调整配置：
-
-```bash
-python -m trajguard run --input ../data/episodes --output ../outputs/processed --config configs/default.json --workers 1
-python -m trajguard run --input ../data/episodes --output ../outputs/processed --config configs/default.json --workers 1 --resume
-```
-
-输入和输出目录需分离。工作进程数通过 `--workers` 调整。ALOHA 示例配置为 `configs/aloha_blog.json`；时间戳路径、单位和动作列设置见 [数据约定](docs/DATA_CONTRACT.md)。
-
-### 4. 候选标签与审核
-
-```bash
-python -m trajguard label-template --manifest ../outputs/processed/manifest.json --output ../outputs/processed/candidates.json
-# 填写候选指令、来源和审核信息后执行
-python -m trajguard labels --manifest ../outputs/processed/manifest.json --input ../outputs/processed/candidates.json --output ../outputs/processed/labels.json
-```
-
-标签状态包括 candidate、reviewed、uncertain。reviewed 需要审核人，VLM 来源需要 model 和 prompt_version；校验来源及结构，语义正确性由审核环节判断。
-
-## 🎬 生成自己的演示视频
-
-```bash
-python -m pip install Pillow imageio-ffmpeg
-python scripts/render_demo.py --manifest ../outputs/aloha-real/processed/manifest.json --output assets/trajguard-demo.mp4 --swap-rb
-```
-
-脚本从 accepted 成品逐帧读取三路相机编码数据，生成 H.264 MP4、封面和预览元数据。`--swap-rb` 是当前 ALOHA 样本经参考画面核对后的颜色设置；其他数据需根据颜色语义选择。默认字体为 Windows Segoe UI，Linux 使用 `--font` 指定可用的 TrueType 字体路径。
-
-## 🧩 模块演示（Modules）
-
-```bash
-python -m pip install scipy opencv-python Pillow tqdm
-python generate_test_cases.py
-python time_sync_show.py
-python main_pipeline.py
-python inspect_clean_data.py
-```
-
-生成器写入 `test_data/`，主脚本固定读取该目录并输出 `clean_data/`，指令为模拟文本。其解析器接收约定字段的已解码图像；压缩 ALOHA 数据使用 TrajGuard 入口。
-
-```bash
-python -c "from bridge_parser import VLADatasetParser; p=VLADatasetParser('test_data/case1_perfect.hdf5'); p.extract_trajectory(); p.export_to_mp4('trajectory_preview.mp4')"
-```
-
-视频接口接受 RGB 像素，默认以 30 fps 播放；播放速率与采集时间语义分开管理。
-
-## 📂 项目结构（Structure）
+## 工作流与边界
 
 ```text
-.
-├── main_pipeline.py       # 模块串联与进程池演示
-├── bridge_parser.py       # 字段解析、MP4 导出
-├── kinematic_filter.py    # 长度、位移、帧间变化检查
-├── time_sync.py           # 线性与最近邻插值
-├── time_sync_show.py      # 重采样示例
-├── vlm_relabel.py          # 关键帧、prompt、模拟重标注
-├── inspect_clean_data.py  # 演示成品检查
-├── generate_test_cases.py # 合成正常/异常轨迹
-├── trajguard/             # 命令行、解析、质检、对齐、存储、审核
-├── configs/               # 处理配置
-├── scripts/               # 数据生成、评估、性能测量
-├── tests/                 # 回归测试
-├── docs/                  # 实现文章、数据约定与实验记录
-└── reproduction/          # 基线复现辅助工具
+来源读取 / 预转换 → Episode 内部表示 → quality / alignment
+                                          ↓
+                            TrajGuard HDF5 + manifest + HTML
+                                          ↓
+                             可选导出器 / 下游训练应用
 ```
 
-## 🧪 测试与性能（Validation）
+- 输入适配器：ALOHA 与 robomimic 风格 HDF5；DROID RLDS 另用预转换入口。
+- 内部约定：状态、动作、相机、指令和独立时间轴；不根据维度猜测机器人。
+- 处理规则：长度、有限值、累计运动、配置的速度限制、时间覆盖及缺口。
+- 输出格式：TrajGuard 自有 HDF5 schema，保存来源、配置、帧映射和签名。
+- 独立集成：LeRobot 0.6.1 导出；π₀.₅、Franka 是下游应用案例。
+
+## 配置与未知语义
+
+参考 configs/default.json；state_semantics/action_semantics 支持 representation、unit、coordinate_frame、rotation、gripper、time_interval、frequency、dimensions。dimensions 中每列包含 name/unit。缺省语义保持 unknown 诊断，基础结构质检可以继续；需要具体语义的处理与导出会检查条件。
+
+逐相机颜色通过 camera_color_orders 声明 rgb/bgr/unknown；时间用记录路径、显式采样率或等长 index_only。state_unit、checked_state_indices 和 max_speed 共同配置速度规则。当前通用线性插值不支持已声明的姿态旋转表示。详细例子见 [数据约定](docs/DATA_CONTRACT.md)。
+
+## 报告与恢复
+
+```text
+output/
+├── episodes/*.hdf5
+├── manifest.json
+├── review_queue.json
+└── report.html
+```
+
+accepted 只表示通过配置规则，不代表完成任务或适合任意模型。review 表示需要结合任务复核；rejected 记录规则/数据条件不满足；failed 表示处理故障。manifest 保存原因、时间模式、语义诊断、配置与来源；成品保留源帧映射。下游只读取当前 accepted 成品列表。
+
+核心恢复按输入、配置及版本签名，并校验成品哈希。数据与配置变化会产生新签名，失败任务可重试。图像在核心管线中保留编码、分块复制；解码有效性检查在有此需要的导出器中完成。
+
+## 可选 LeRobot 集成
+
+Python 3.12+ 独立环境：
+
+```bash
+python -m pip install -e ".[test,lerobot]"
+python -m trajguard export-lerobot --manifest ../outputs/demo/manifest.json --config configs/lerobot_fixture.json --output ../outputs/demo-lerobot
+python scripts/check_lerobot.py --root ../outputs/demo-lerobot --horizon 50
+```
+
+示例配置仅适用于上述合成样例。导出保留维度、任务关联和来源清单，固定间隔片段分开写入，训练统计仅根据 train 划分另存。训练时需显式选择 train episodes 并连接对应归一化 processor。已在真实 LeRobot 0.6.1 writer/reader 上验证图像模式、双相机、动作块与边界 padding；视频模式与其他版本待验证。
+
+[完整集成说明](docs/LEROBOT.md) 包含 DROID 范围、Franka 最小采集约定和未执行的 π₀.₅ 短训模板。它们不是运行核心工具的前提。
+
+## 常见诊断
+
+| 提示 | 处理方法 |
+|---|---|
+| Partial timing information | 为缺时间的流补录时间或显式采样率 |
+| Unequal stream lengths without timestamps | 确认采集频率或提供时间轴，不通过补零假装同步 |
+| semantics unspecified | 基础规则仍可用；训练导出前填写真实语义 |
+| Explicit decoded color semantics / colors | 确认编码后解码颜色，不依据相机名称猜测 |
+| Nonuniform or faster sampling | 上游明确重采样；大缺口会切成独立 episode |
+| Target exists / incomplete | 保留失败目录诊断；用新目标重跑，完整目标用 --resume 校验复用 |
+| Optional integration absent | 用 Python 3.12+ 安装 lerobot 可选项 |
+
+## 测试与扩展
 
 ```bash
 python -m pytest
 ```
 
-测试覆盖时间边界、离散动作、异常数值、多轨迹解析、编码帧保真、损坏成品恢复及标签来源校验。真实 ALOHA 数据测量入口：
+基础测试使用合成 fixture；LeRobot 集成测试在安装可选依赖后运行。真实公开 ALOHA 的历史基础处理记录见 docs/assets；真实 DROID、真实 LeRobot 数据转换、视频编码及模型/硬件均分别标记验证状态。详见兼容性表。
 
-```bash
-python scripts/benchmark_real.py --input ../data/aloha-blog --output ../outputs/aloha-real --config configs/aloha_blog.json --repeats 3 --workers 1 2
-```
+原模块演示仍保留在根目录（main_pipeline.py、bridge_parser.py、kinematic_filter.py、time_sync.py、vlm_relabel.py 等）。它们展示解析、插值、视频和模拟重标注，推荐日常入口为 python -m trajguard。完整背景文章见 [BLOG.md](docs/BLOG.md)。
 
-该脚本针对 ALOHA 索引配对导出进行测量与核验。分块读写控制图像缓冲量；有界任务提交控制并发积压；断点恢复避免重复导出。并发配置应根据磁盘带宽、轨迹长度和内存预算选择。
+## 来源与发布状态
 
-## 致谢
-
-项目参考 [Escapist-coder/VLA-Data-Pipeline](https://github.com/Escapist-coder/VLA-Data-Pipeline)，原始脚本及 [上游说明](docs/UPSTREAM_README.md) 保留在仓库中。ALOHA 数据入口见 [公开数据目录](https://drive.google.com/drive/folders/1vhKa4tNPfMkeK7SW86vKorb39epTYW39)。
-
-## LeRobot 训练数据接入（开发中）
-
-新增 export-lerobot 和 import-droid 入口，配置、验证范围及 Franka 采集约定见 [LeRobot 接入说明](docs/LEROBOT.md)。使用可选的独立 LeRobot 0.6.1 环境；核心管线依赖保持不变。
+保留 [Escapist-coder/VLA-Data-Pipeline](https://github.com/Escapist-coder/VLA-Data-Pipeline) 原模块和 [原介绍](docs/UPSTREAM_README.md)。本仓库当前缺少完整项目许可证；第三方代码与样例授权范围尚待确认，不能把整仓库视为已获 MIT 授权。自有代码许可选择、样例再分发条件及发布待办见 [发布状态](docs/RELEASE_STATUS.md)。

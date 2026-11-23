@@ -58,3 +58,23 @@ ALOHA 风格为根目录 episode；robomimic 风格为 data/demo_*，以下路�
 state_previous 是插值左侧索引，可结合原始时间轴重建右侧。属性包含 schema_version、provenance（源 SHA256、episode、配置、版本）、alignment、state_kind、state_unit；图像包含 storage_kind、decoded_color_order。源时间仅在可用时保存，帧映射总是存在。
 
 这是 TrajGuard 自身 schema，不宣称可直接送入 LeRobot/ACT/OpenVLA。后续需要受测试的训练加载器或导出适配器。
+
+## 可选机器人语义（不绑定模型或控制软件）
+
+Config.state_semantics 与 action_semantics 为对象，缺省为空，表示未知。允许 representation、unit、coordinate_frame、rotation、gripper、time_interval、frequency、dimensions；dimensions 是逐维 name/unit 对象列表，提供时必须匹配矩阵维度。frequency 可以是正数或 unknown，它描述语义，不能代替 state_fps/action_fps 等实际时间轴配置。速度检查目前仍使用 state_unit 与 checked_state_indices，不自动从描述推导单位。
+
+示例：
+
+```json
+{
+  "state_semantics": {"representation": "joint_position", "unit": "rad", "coordinate_frame": "joint", "rotation": "none"},
+  "action_semantics": {"representation": "joint_position", "coordinate_frame": "joint", "rotation": "none", "gripper": "unknown", "time_interval": "unknown"},
+  "camera_color_orders": {"cam_high": "rgb"}
+}
+```
+
+这是配置语法，不是 ALOHA/Franka 的已确认物理定义。声明带旋转的状态线性重采样或动作线性重采样会报 pose-aware interpolation not implemented。动作 previous 保留原始指令值。未提供语义时保留诊断，不把结构质检通过解释为语义已验证。
+
+成品属性 semantics 记录配置；provenance.source_metadata 记录源 episode 属性（字符串值）。DROID source_identity 可以跨预转换版本用于划分；不同来源必须保证稳定身份不会碰撞。逐相机颜色覆盖全局 decoded_color_order。
+
+LeRobot 是独立导出接口，要求额外条件，参见 LEROBOT.md 和 COMPATIBILITY.md；核心 schema 本身不等于 LeRobotDataset。

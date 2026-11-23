@@ -59,6 +59,7 @@ def write_episode(path, episode, aligned, config, provenance):
             target.attrs["alignment"] = json.dumps(aligned["metadata"])
             target.attrs["state_kind"] = episode.state_kind
             target.attrs["state_unit"] = config.state_unit
+            target.attrs['semantics'] = json.dumps({'state': config.state_semantics, 'action': config.action_semantics})
             target.create_dataset("state", data=aligned["state"])
             target.create_dataset("actions", data=aligned["actions"])
             target.create_dataset("instruction", data=episode.instruction, dtype=h5py.string_dtype())
@@ -75,7 +76,7 @@ def write_episode(path, episode, aligned, config, provenance):
             for name, source in episode.cameras.items():
                 indices = aligned["camera_indices"][name]
                 copied = copy_images(source, images, name, indices, config.chunk_frames)
-                copied.attrs["decoded_color_order"] = config.decoded_color_order
+                copied.attrs["decoded_color_order"] = config.camera_color_orders.get(name, config.decoded_color_order)
                 mapping.create_dataset(f"images/{name}", data=indices)
                 if episode.camera_times[name] is not None:
                     target.create_dataset(f"source_times/images/{name}", data=episode.camera_times[name])

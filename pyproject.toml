@@ -12,6 +12,8 @@ dependencies = ["numpy>=1.24", "h5py>=3.8"]
 [project.optional-dependencies]
 test = ["pytest>=7", "Pillow>=9"]
 benchmark = ["psutil>=5.9"]
+lerobot = ["lerobot[dataset]==0.6.1; python_version >= '3.12'", "Pillow>=10"]
+droid = ["tensorflow-datasets>=4.9", "tensorflow>=2.16; python_version >= '3.10' and python_version < '3.13'"]
 
 [project.scripts]
 trajguard = "trajguard.cli:main"

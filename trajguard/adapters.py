@@ -82,6 +82,12 @@ def read_episode(group, config):
         cameras = {"images0": group["observations/images0"]}
     if not cameras:
         raise InvalidEpisode("No supported camera datasets")
+    if set(config.camera_color_orders) - set(cameras):
+        raise InvalidEpisode('Configured color camera names not present')
+    for name, values in [('state', state), ('action', actions)]:
+        dimensions = getattr(config, f'{name}_semantics').get('dimensions', [])
+        if dimensions and len(dimensions) != values.shape[1]:
+            raise InvalidEpisode(f'{name} semantic dimensions do not match data')
     if set(config.camera_timestamp_paths) - set(cameras):
         raise InvalidEpisode("Configured timestamp camera names not present in input")
     for name, images in cameras.items():
